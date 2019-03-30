@@ -1,6 +1,6 @@
-First commit
+- Client and server use md5 to check the package ( not good! )
 
-Client (C# WPF - Visual Studio IDE)
+=== Client (C# WPF - Visual Studio IDE) ===
 
-Server (Arduino IDE)
-- use MD5 (https://github.com/tzikis/ArduinoMD5/)
+=== Server (Arduino IDE) ===
+- Use MD5 library (https://github.com/tzikis/ArduinoMD5/)

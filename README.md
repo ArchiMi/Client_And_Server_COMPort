@@ -1,6 +1,16 @@
-- Client and server use md5 to check the package ( not good! )
+Client And Server
 
-=== Client (C# WPF - Visual Studio IDE) ===
+
+=== Client (C# 'WPF' - Visual Studio IDE) ===
+1) Установить последовательное соединение с сервером (atmega328p) Baud-256000, MHz-16UL
+2) Отправка запросов и получение ответов от контроллера atmega328p. (реализовано)
+3) Определиться формировать CRC8 передаваемого пакета.
+4) Определиться со списком команд и параметров.
 
 === Server (Arduino IDE) ===
-- Use MD5 library (https://github.com/tzikis/ArduinoMD5/)
+None
+
+=== Server (C++ - Atmel Studio) ===
+1) Определиться параметрами инициализации при работе с контроллером atmega8
+2) Получение запроса и отправка ответа клиенту. (реализовано) 
+3) Проверять CRC8 полученного пакета.

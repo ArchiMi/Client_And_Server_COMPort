@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.421
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArduinoDeamon", "ArduinoDeamon\ArduinoDeamon.csproj", "{29A4CF8A-94BA-471E-9420-D4106D7CF681}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApplicationMachine", "ArduinoDeamon\ApplicationMachine.csproj", "{29A4CF8A-94BA-471E-9420-D4106D7CF681}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

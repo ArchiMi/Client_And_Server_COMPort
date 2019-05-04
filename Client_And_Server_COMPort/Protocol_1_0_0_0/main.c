@@ -3,9 +3,7 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
-#define BAUD_PRESCALE 7 //207 (Из таблицы Examples of UBRRn Settings for atmel328p "7 - 256000 Baud")
-//#define BAUDRATE 9600 
-//#define BAUD_PRESCALLER (((F_CPU / (BAUDRATE * 16UL))) - 1)
+#define BAUD_PRESCALE 7 // (Из таблицы Examples of UBRRn Settings for ATmega328P "7 - 256000 Baud")
 #define FRAME_SIZE 32
 #define END_LINE 13
 
@@ -25,8 +23,8 @@ unsigned char USART_Receive(void) {
 
 void USART_Receive_Str(char *calledstring) {
 	char ch;
-	int i = 0;
 	
+	int i = 0;	
 	while(1) {		
 		ch = USART_Receive();
 		

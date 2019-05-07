@@ -139,7 +139,7 @@ int main(void) {
 		input_str[8] = crc_value;
 		*/
 		
-		input[7] = Crc8(input, 6);
+		input[7] = Crc8(input, 7);
 		
 		USART_Transmit_Str(input);
 		USART_Transmit_Str("\r");

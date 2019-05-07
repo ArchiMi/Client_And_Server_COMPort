@@ -13,7 +13,7 @@
     <OutputFileExtension>.elf</OutputFileExtension>
     <OutputDirectory>$(MSBuildProjectDirectory)\$(Configuration)</OutputDirectory>
     <AssemblyName>Protocol_1_0_0_0</AssemblyName>
-    <Name>Protocol_1_0_0_0</Name>
+    <Name>ProtocolExchange</Name>
     <RootNamespace>Protocol_1_0_0_0</RootNamespace>
     <ToolchainFlavour>Native</ToolchainFlavour>
     <KeepTimersRunning>true</KeepTimersRunning>

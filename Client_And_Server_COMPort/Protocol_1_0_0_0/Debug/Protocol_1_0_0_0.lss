@@ -380,8 +380,8 @@ int main(void) {
 		input_str[8] = crc_value;
 		*/
 		
-		input[7] = Crc8(input, 6);
- 1ea:	66 e0       	ldi	r22, 0x06	; 6
+		input[7] = Crc8(input, 7);
+ 1ea:	67 e0       	ldi	r22, 0x07	; 7
  1ec:	ce 01       	movw	r24, r28
  1ee:	01 96       	adiw	r24, 0x01	; 1
  1f0:	0e 94 4b 00 	call	0x96	; 0x96 <Crc8>

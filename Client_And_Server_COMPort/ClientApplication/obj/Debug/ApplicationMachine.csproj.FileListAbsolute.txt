@@ -27,4 +27,3 @@ C:\Projects\ClientServer\Client_And_Server_COMPort\ClientApplication\obj\Debug\A
 C:\Projects\ClientServer\Client_And_Server_COMPort\ClientApplication\obj\Debug\ApplicationMachine.csproj.CoreCompileInputs.cache
 C:\Projects\ClientServer\Client_And_Server_COMPort\ClientApplication\obj\Debug\ArduinoDeamon.exe
 C:\Projects\ClientServer\Client_And_Server_COMPort\ClientApplication\obj\Debug\ArduinoDeamon.pdb
-C:\Projects\ClientServer\Client_And_Server_COMPort\ClientApplication\obj\Debug\ApplicationMachine.csprojAssemblyReference.cache

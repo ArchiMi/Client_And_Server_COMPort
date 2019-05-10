@@ -106,6 +106,19 @@ namespace ArduinoDeamon
             msg_list.Items.Clear();
         }
 
+        private void CheckEndChar(char[] msg, byte value)
+        {
+            msg[0] = (char)value;
+
+            for (int i = 0; i < msg.Length - 1; i++)
+            {
+                //msg[i] = (char)i; //Convert.ToChar(temp_str);
+                
+                if (msg[i] == '\0' || msg[i] == '\r' || msg[i] > 255)
+                    msg[i] = (char)1;
+            }
+        }
+
         private void DoStart()
         {
             char[] msg = new char[9];
@@ -119,11 +132,12 @@ namespace ArduinoDeamon
             msg[7] = (char)155;
             msg[8] = '\r';
             
-            for (int i = 0; i < 900000; i++)
+            for (int i = 0; i < 300; i++)
             {
-                msg[0] = (char)i; //Convert.ToChar(temp_str);
-                if (msg[0] == 0 || msg[0] == 13)
-                    msg[0] = (char)1;
+                if (i == 255)
+                    Thread.Sleep(1000);
+
+                CheckEndChar(msg, (byte)i);
 
                 byte[] temp = msg.Select(c => (byte)c).ToArray();
 

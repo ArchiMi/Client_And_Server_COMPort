@@ -4,11 +4,13 @@
 #include <util/delay.h>
 #include <avr/pgmspace.h>
 
+typedef unsigned char BYTE;
+
 #define BAUD_PRESCALE 7 // (Из таблицы Examples of UBRRn Settings for ATmega328P "7 - 256000 Baud")
 #define FRAME_SIZE 32
 #define END_LINE 13
 
-const unsigned char Crc8Table[] = {
+const BYTE Crc8Table[] = {
 	0x81, 0x31, 0x62, 0x53, 0xC4, 0xF5, 0xA6, 0x97,
 	0xB9, 0x88, 0xDB, 0xEA, 0x7D, 0x4C, 0x1F, 0x2E,
 	0x43, 0x72, 0x21, 0x10, 0x87, 0xB6, 0xE5, 0xD4,
@@ -64,12 +66,12 @@ void USART_Init() {
 	UCSR0C = (0<<UMSEL01) | (0<<UMSEL00) | (1<<USBS0) | (1<<UCSZ00) | (1<<UCSZ01) | (1 << UCSZ00);
 }
 
-unsigned char USART_Receive(void) {	
+BYTE USART_Receive(void) {	
 	while( !(UCSR0A & (1<<RXC0)) );
 	return UDR0;
 }
 
-void USART_Receive_Str(unsigned char *calledstring) {
+void USART_Receive_Str(BYTE *calledstring) {
 	char ch;
 	
 	int i = 0;	
@@ -86,12 +88,12 @@ void USART_Receive_Str(unsigned char *calledstring) {
 	}	
 }
 
-void USART_Send(unsigned char data) {
+void USART_Send(BYTE data) {
 	while( !(UCSR0A & (1<<UDRE0)) );
 	UDR0 = data;
 }
 
-void USART_Transmit_Str(unsigned char *calledstring) {
+void USART_Transmit_Str(BYTE *calledstring) {
 	for (int i = 0; i < FRAME_SIZE; i++) {
 		if (calledstring[i] != 0)
 			USART_Send(calledstring[i]);
@@ -107,7 +109,7 @@ void blink() {
 	_delay_ms(100);
 }
 
-void Clean_Data(unsigned char *input_data) {
+void Clean_Data(BYTE *input_data) {
 	for (int i = 0; i < FRAME_SIZE; i++) {
 		input_data[i] = 0;
 	}
@@ -116,7 +118,7 @@ void Clean_Data(unsigned char *input_data) {
 int main(void) {
 	DDRB = 0xFF; //PORTC as Output
 	
-	unsigned char input[FRAME_SIZE] = { 0 };
+	BYTE input[FRAME_SIZE] = { 0 };
 	USART_Init();       
 	
 	while(1) {

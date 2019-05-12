@@ -1,6 +1,7 @@
 ﻿using ArduinoDeamon.Src;
 using System;
 using System.ComponentModel;
+using System.IO;
 using System.IO.Ports;
 using System.Linq;
 using System.Security.Cryptography;
@@ -17,9 +18,16 @@ namespace ArduinoDeamon
     {
         private SerialPort serial_port;
         private Thread thraed;
+        private string com_port;
 
         private void InitComPort(string com_port)
         {
+            if (serial_port != null && serial_port.IsOpen)
+            {
+                serial_port.Close();
+                serial_port = null;
+            }
+
             if (serial_port == null)
             {
                 serial_port = new SerialPort(com_port);
@@ -28,8 +36,8 @@ namespace ArduinoDeamon
                 serial_port.DataBits = 8;
 
                 serial_port.StopBits = StopBits.Two;
-                serial_port.ReadTimeout = 1500; //-1 200
-                serial_port.WriteTimeout = 1500; //-1 50
+                serial_port.ReadTimeout = 10000; //-1 200
+                serial_port.WriteTimeout = 10000; //-1 50
                 serial_port.Handshake = Handshake.None;
                 serial_port.Encoding = Encoding.Default;
                 //serial_port.DataReceived += new SerialDataReceivedEventHandler(port_DataReceived);
@@ -56,7 +64,10 @@ namespace ArduinoDeamon
             InitializeComponent();
 
             if (LoadListComPorts() > 0)
-                InitComPort((string)cb_ComPorts.SelectedValue);            
+            {
+                this.com_port = (string)cb_ComPorts.SelectedValue;
+                InitComPort(this.com_port);
+            }
         }
 
         private void port_DataReceived(object sender, SerialDataReceivedEventArgs e)
@@ -75,24 +86,6 @@ namespace ArduinoDeamon
             {
 
             }
-        }
-
-        string GetMd5Hash(MD5 md5Hash, string input)
-        {
-            // Convert the input string to a byte array and compute the hash.
-            byte[] data = md5Hash.ComputeHash(Encoding.UTF8.GetBytes(input));
-
-            // Create a new Stringbuilder to collect the bytes
-            // and create a string.
-            StringBuilder sb = new StringBuilder();
-
-            // Loop through each byte of the hashed data 
-            // and format each one as a hexadecimal string.
-            for (int i = 0; i < data.Length; i++)
-                sb.Append(data[i].ToString("x2"));
-
-            // Return the hexadecimal string.
-            return sb.ToString();
         }
 
         private void Window_Closed(object sender, EventArgs e)
@@ -132,11 +125,8 @@ namespace ArduinoDeamon
             msg[7] = (char)155;
             msg[8] = '\r';
             
-            for (int i = 0; i < 300; i++)
+            for (int i = 0; i < 1000000; i++)
             {
-                if (i == 255)
-                    Thread.Sleep(1000);
-
                 CheckEndChar(msg, (byte)i);
 
                 byte[] temp = msg.Select(c => (byte)c).ToArray();
@@ -170,15 +160,32 @@ namespace ArduinoDeamon
                 src_msg_chars[7] = sum.Crc8Bytes(src_msg_chars, 7);
                 string temp_src_msg = string.Join(",", src_msg_chars.Select(p => p.ToString()).ToArray()); //"60,43,53,..."
 
-                serial_port.Write(src_msg_chars, 0, src_msg_chars.Count());
+                try
+                {
+                    serial_port.Write(src_msg_chars, 0, src_msg_chars.Count());
+                }
+                catch (InvalidOperationException ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
 
-                //string result = serial_port.ReadTo("\r");
-                //string result = serial_port.ReadLine();
-                
                 char[] result = new char[9];
-                ReadBytes(result);
-                //serial_port.Read(result, 0, 8);
+                try
+                {
+                    //string result = serial_port.ReadTo("\r");
+                    //string result = serial_port.ReadLine();
 
+                    ReadBytes(result);
+                    //serial_port.Read(result, 0, 8);
+                }
+                catch (IOException)
+                {
+                    InitComPort(this.com_port);
+                }
+                catch (TimeoutException)
+                {
+                    InitComPort(this.com_port);
+                }
                 
                 //result = result.Trim();
                 string temp_res_msg = string.Join(",", result.Select(x => ((byte)x).ToString()).ToArray());
@@ -186,7 +193,7 @@ namespace ArduinoDeamon
                 //Log
                 this.Dispatcher.Invoke((Action)(() =>
                 {
-                    string time = DateTime.Now.ToString("MM/dd/yy H:mm:ss fff");
+                    string time = DateTime.Now.ToString("dd/MM/yy HH:mm:ss fff");
                     //this.msg_list.Items.Add($"{time}: Message '{message}' ({(hash.Trim().Equals(result.Trim()) ? "TRUE" : "FALSE")})");
                     this.msg_list.Items.Add($"{time}: ==> '{temp_src_msg}' and '{temp_res_msg}'");
                 }));
@@ -210,18 +217,20 @@ namespace ArduinoDeamon
             int i = 0;
             int x = 0;
 
-            do
+            try
             {
-                x = serial_port.ReadByte();
-                bytes[i++] = (char)x;
+                do
+                {
+                    x = serial_port.ReadByte();
+                    bytes[i++] = (char)x;
 
-            } while (x != '\r');
+                } while (x != '\r' || i == bytes.Length - 1);
+            }
+            catch(IndexOutOfRangeException ex)
+            {
+                MessageBox.Show($"{ex.Message} (index={i})");
+            }
         }
-
-
-
-
-
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {

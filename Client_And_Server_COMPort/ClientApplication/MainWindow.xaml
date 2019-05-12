@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ArduinoDeamon"
         mc:Ignorable="d"
-        Title="MainWindow" Height="644.906" Width="528.479" Closed="Window_Closed" Closing="Window_Closing">
+        Title="MainWindow" Height="644.906" Width="681.22" Closed="Window_Closed" Closing="Window_Closing">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>

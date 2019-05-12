@@ -13,19 +13,19 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY
   4 .debug_aranges 00000060  00000000  00000000  000003fc  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_info   000009e3  00000000  00000000  0000045c  2**0
+  5 .debug_info   000009ee  00000000  00000000  0000045c  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_abbrev 000007c5  00000000  00000000  00000e3f  2**0
+  6 .debug_abbrev 000007c5  00000000  00000000  00000e4a  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_line   0000041a  00000000  00000000  00001604  2**0
+  7 .debug_line   0000041a  00000000  00000000  0000160f  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_frame  000000e8  00000000  00000000  00001a20  2**2
+  8 .debug_frame  000000e8  00000000  00000000  00001a2c  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    0000042c  00000000  00000000  00001b08  2**0
+  9 .debug_str    00000431  00000000  00000000  00001b14  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_loc    000003e9  00000000  00000000  00001f34  2**0
+ 10 .debug_loc    000003e9  00000000  00000000  00001f45  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_ranges 00000050  00000000  00000000  0000231d  2**0
+ 11 .debug_ranges 00000050  00000000  00000000  0000232e  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -158,7 +158,7 @@ void USART_Init() {
 000000e0 <USART_Receive>:
 }
 
-unsigned char USART_Receive(void) {	
+BYTE USART_Receive(void) {	
 	while( !(UCSR0A & (1<<RXC0)) );
   e0:	e0 ec       	ldi	r30, 0xC0	; 192
   e2:	f0 e0       	ldi	r31, 0x00	; 0
@@ -172,7 +172,7 @@ unsigned char USART_Receive(void) {
 
 000000f0 <USART_Receive_Str>:
 
-void USART_Receive_Str(unsigned char *calledstring) {
+void USART_Receive_Str(BYTE *calledstring) {
   f0:	ef 92       	push	r14
   f2:	ff 92       	push	r15
   f4:	0f 93       	push	r16
@@ -220,7 +220,7 @@ void USART_Receive_Str(unsigned char *calledstring) {
 
 0000012c <USART_Send>:
 
-void USART_Send(unsigned char data) {
+void USART_Send(BYTE data) {
 	while( !(UCSR0A & (1<<UDRE0)) );
  12c:	e0 ec       	ldi	r30, 0xC0	; 192
  12e:	f0 e0       	ldi	r31, 0x00	; 0
@@ -234,7 +234,7 @@ void USART_Send(unsigned char data) {
 0000013c <USART_Transmit_Str>:
 }
 
-void USART_Transmit_Str(unsigned char *calledstring) {
+void USART_Transmit_Str(BYTE *calledstring) {
  13c:	0f 93       	push	r16
  13e:	1f 93       	push	r17
  140:	cf 93       	push	r28
@@ -255,7 +255,7 @@ void USART_Transmit_Str(unsigned char *calledstring) {
 	UDR0 = data;
 }
 
-void USART_Transmit_Str(unsigned char *calledstring) {
+void USART_Transmit_Str(BYTE *calledstring) {
 	for (int i = 0; i < FRAME_SIZE; i++) {
  158:	0c 17       	cp	r16, r28
  15a:	1d 07       	cpc	r17, r29
@@ -319,7 +319,7 @@ void blink() {
 	_delay_ms(100);
 }
 
-void Clean_Data(unsigned char *input_data) {
+void Clean_Data(BYTE *input_data) {
  1a6:	fc 01       	movw	r30, r24
  1a8:	80 96       	adiw	r24, 0x20	; 32
 	for (int i = 0; i < FRAME_SIZE; i++) {
@@ -329,7 +329,7 @@ void Clean_Data(unsigned char *input_data) {
 	_delay_ms(100);
 }
 
-void Clean_Data(unsigned char *input_data) {
+void Clean_Data(BYTE *input_data) {
 	for (int i = 0; i < FRAME_SIZE; i++) {
  1ac:	e8 17       	cp	r30, r24
  1ae:	f9 07       	cpc	r31, r25
@@ -356,7 +356,7 @@ int main(void) {
  1c8:	8f ef       	ldi	r24, 0xFF	; 255
  1ca:	84 b9       	out	0x04, r24	; 4
 	
-	unsigned char input[FRAME_SIZE] = { 0 };
+	BYTE input[FRAME_SIZE] = { 0 };
  1cc:	fe 01       	movw	r30, r28
  1ce:	31 96       	adiw	r30, 0x01	; 1
  1d0:	80 e2       	ldi	r24, 0x20	; 32

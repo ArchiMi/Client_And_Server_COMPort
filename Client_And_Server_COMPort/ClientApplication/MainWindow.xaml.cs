@@ -16,7 +16,10 @@ namespace ArduinoDeamon
     /// </summary>
     public partial class MainWindow : Window
     {
+        private const int FRAME_LENGTH = 17;
+
         private SerialPort serial_port;
+        private crc8 sum;
         private Thread thraed;
         private string com_port;
 
@@ -31,7 +34,11 @@ namespace ArduinoDeamon
             if (serial_port == null)
             {
                 serial_port = new SerialPort(com_port);
-                serial_port.BaudRate = 256000; //50, 75, 110, 150, 300, 600, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200 
+
+                //4800, 9600, 19200, 38400, 57600, 115200
+                serial_port.BaudRate = 256000;  
+                //serial_port.BaudRate = 9600;
+
                 serial_port.Parity = Parity.None;
                 serial_port.DataBits = 8;
 
@@ -63,6 +70,7 @@ namespace ArduinoDeamon
         {
             InitializeComponent();
 
+            this.sum = new crc8();
             if (LoadListComPorts() > 0)
             {
                 this.com_port = (string)cb_ComPorts.SelectedValue;
@@ -70,6 +78,7 @@ namespace ArduinoDeamon
             }
         }
 
+        /*
         private void port_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             try
@@ -87,6 +96,7 @@ namespace ArduinoDeamon
 
             }
         }
+        */
 
         private void Window_Closed(object sender, EventArgs e)
         {
@@ -106,7 +116,7 @@ namespace ArduinoDeamon
             for (int i = 0; i < msg.Length - 1; i++)
             {
                 //msg[i] = (char)i; //Convert.ToChar(temp_str);
-                
+
                 if (msg[i] == '\0' || msg[i] == '\r' || msg[i] > 255)
                     msg[i] = (char)1;
             }
@@ -114,24 +124,42 @@ namespace ArduinoDeamon
 
         private void DoStart()
         {
-            char[] msg = new char[9];
-            msg[0] = (char)148;
-            msg[1] = (char)149;
-            msg[2] = (char)150;
-            msg[3] = (char)151;
-            msg[4] = (char)152;
-            msg[5] = (char)153;
-            msg[6] = (char)154;
-            msg[7] = (char)155;
-            msg[8] = '\r';
-            
-            for (int i = 0; i < 1000000; i++)
+            try
             {
-                CheckEndChar(msg, (byte)i);
+                this.Dispatcher.Invoke((Action)(() =>
+                {
+                    this.btn_start.IsEnabled = false;
+                    this.btn_clear.IsEnabled = false;
+                }));
 
-                byte[] temp = msg.Select(c => (byte)c).ToArray();
+                char[] msg = new char[FRAME_LENGTH];
+                msg[0] = (char)148;
+                msg[1] = (char)149;
+                msg[2] = (char)150;
+                msg[3] = (char)151;
+                msg[4] = (char)152;
+                msg[5] = (char)153;
+                msg[6] = (char)154;
+                msg[7] = (char)155;
+                msg[8] = (char)0;
+                msg[16] = '\r';
+            
+                for (int i = 0; i < 1000000; i++)
+                {
+                    CheckEndChar(msg, (byte)i);
 
-                PortWrite(temp);
+                    byte[] temp = msg.Select(c => (byte)c).ToArray();
+
+                    PortWrite(temp);
+                }
+            }
+            finally
+            {
+                this.Dispatcher.Invoke((Action)(() =>
+                {
+                    this.btn_start.IsEnabled = true;
+                    this.btn_clear.IsEnabled = true;
+                }));
             }
         }
 
@@ -144,72 +172,54 @@ namespace ArduinoDeamon
 
         private void PortWrite(byte[] src_msg_chars)
         {
+            int index_crc8 = src_msg_chars.Length - 2; //2 crars - 'crc8' char and '\r' char
+
+            //Очистим буфер In перед отправкой данных
+            if (serial_port.IsOpen)
+                serial_port.DiscardInBuffer();
+
+            //Get CRC8
+            src_msg_chars[index_crc8] = this.sum.Crc8Bytes(src_msg_chars, index_crc8);
+            string temp_src_msg = string.Join(",", src_msg_chars.Select(p => p.ToString()).ToArray());
+
+            //Write
             try
             {
-                this.Dispatcher.Invoke((Action)(() =>
-                {
-                    this.btn_start.IsEnabled = false;
-                    this.btn_clear.IsEnabled = false;
-                }));
-
-                //Очистим буфер In перед отправкой данных
-                if (serial_port.IsOpen)
-                    serial_port.DiscardInBuffer();
-
-                crc8 sum = new crc8();
-                src_msg_chars[7] = sum.Crc8Bytes(src_msg_chars, 7);
-                string temp_src_msg = string.Join(",", src_msg_chars.Select(p => p.ToString()).ToArray()); //"60,43,53,..."
-
-                try
-                {
-                    serial_port.Write(src_msg_chars, 0, src_msg_chars.Count());
-                }
-                catch (InvalidOperationException ex)
-                {
-                    MessageBox.Show(ex.Message);
-                }
-
-                char[] result = new char[9];
-                try
-                {
-                    //string result = serial_port.ReadTo("\r");
-                    //string result = serial_port.ReadLine();
-
-                    ReadBytes(result);
-                    //serial_port.Read(result, 0, 8);
-                }
-                catch (IOException)
-                {
-                    InitComPort(this.com_port);
-                }
-                catch (TimeoutException)
-                {
-                    InitComPort(this.com_port);
-                }
-                
-                //result = result.Trim();
-                string temp_res_msg = string.Join(",", result.Select(x => ((byte)x).ToString()).ToArray());
-
-                //Log
-                this.Dispatcher.Invoke((Action)(() =>
-                {
-                    string time = DateTime.Now.ToString("dd/MM/yy HH:mm:ss fff");
-                    //this.msg_list.Items.Add($"{time}: Message '{message}' ({(hash.Trim().Equals(result.Trim()) ? "TRUE" : "FALSE")})");
-                    this.msg_list.Items.Add($"{time}: ==> '{temp_src_msg}' and '{temp_res_msg}'");
-                }));
-
-                //Очистим буфер Out после приема данных
-                if (serial_port.IsOpen)
-                    serial_port.DiscardOutBuffer();
+                serial_port.Write(src_msg_chars, 0, src_msg_chars.Count());
             }
-            finally
+            catch (InvalidOperationException ex)
             {
-                this.Dispatcher.Invoke((Action)(() =>
-                {
-                    this.btn_start.IsEnabled = true;
-                    this.btn_clear.IsEnabled = true;
-                }));
+                MessageBox.Show(ex.Message);
             }
+
+            //Read
+            char[] result = new char[FRAME_LENGTH];
+            try
+            {
+                ReadBytes(result);
+            }
+            catch (IOException)
+            {
+                InitComPort(this.com_port);
+            }
+            catch (TimeoutException)
+            {
+                InitComPort(this.com_port);
+            }
+                
+            string temp_res_msg = string.Join(",", result.Select(x => ((byte)x).ToString()).ToArray());
+
+            //Log
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                string time = DateTime.Now.ToString("dd/MM/yy HH:mm:ss fff");
+                //this.msg_list.Items.Add($"{time}: Message '{message}' ({(hash.Trim().Equals(result.Trim()) ? "TRUE" : "FALSE")})");
+                this.msg_list.Items.Add($"{time}: ==> '{temp_src_msg}' and '{temp_res_msg}'");
+            }));
+
+            //Очистим буфер Out после приема данных
+            if (serial_port.IsOpen)
+                serial_port.DiscardOutBuffer();            
         }
 
         private void ReadBytes(char[] bytes)
@@ -228,7 +238,7 @@ namespace ArduinoDeamon
             }
             catch(IndexOutOfRangeException ex)
             {
-                MessageBox.Show($"{ex.Message} (index={i})");
+                //MessageBox.Show($"{ex.Message} (index={i})");
             }
         }
 

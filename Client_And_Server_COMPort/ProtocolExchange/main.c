@@ -4,13 +4,16 @@
 #include <util/delay.h>
 #include <avr/pgmspace.h>
 
-typedef unsigned char BYTE;
+typedef unsigned char byte;
 
-#define BAUD_PRESCALE 7 // (Из таблицы Examples of UBRRn Settings for ATmega328P "7 - 256000 Baud")
+// (Из таблицы Examples of UBRRn Settings for ATmega328P "7 - 256000 Baud" или 207 - 9600)
+//#define BAUD_PRESCALE 207
+#define BAUD_PRESCALE 7
+
 #define FRAME_SIZE 32
 #define END_LINE 13
 
-const BYTE Crc8Table[] = {
+const byte Crc8Table[] = {
 	0x81, 0x31, 0x62, 0x53, 0xC4, 0xF5, 0xA6, 0x97,
 	0xB9, 0x88, 0xDB, 0xEA, 0x7D, 0x4C, 0x1F, 0x2E,
 	0x43, 0x72, 0x21, 0x10, 0x87, 0xB6, 0xE5, 0xD4,
@@ -66,12 +69,12 @@ void USART_Init() {
 	UCSR0C = (0<<UMSEL01) | (0<<UMSEL00) | (1<<USBS0) | (1<<UCSZ00) | (1<<UCSZ01) | (1 << UCSZ00);
 }
 
-BYTE USART_Receive(void) {	
+byte USART_Receive(void) {	
 	while( !(UCSR0A & (1<<RXC0)) );
 	return UDR0;
 }
 
-void USART_Receive_Str(BYTE *calledstring) {
+void USART_Receive_Str(byte *calledstring) {
 	char ch;
 	
 	int i = 0;	
@@ -79,21 +82,22 @@ void USART_Receive_Str(BYTE *calledstring) {
 		ch = USART_Receive();
 		
 		if (ch == END_LINE) {
-			calledstring[i] = 0;	
+			calledstring[i] = END_LINE;	
 			return;
 		} else {
-			calledstring[i] = ch;
-			i++;
+			calledstring[i] = ch;			
 		}
+		
+		i++;
 	}	
 }
 
-void USART_Send(BYTE data) {
+void USART_Send(byte data) {
 	while( !(UCSR0A & (1<<UDRE0)) );
 	UDR0 = data;
 }
 
-void USART_Transmit_Str(BYTE *calledstring) {
+void USART_Transmit_Str(byte *calledstring) {
 	for (int i = 0; i < FRAME_SIZE; i++) {
 		if (calledstring[i] != 0)
 			USART_Send(calledstring[i]);
@@ -109,20 +113,37 @@ void blink() {
 	_delay_ms(100);
 }
 
-void Clean_Data(BYTE *input_data) {
-	for (int i = 0; i < FRAME_SIZE; i++) {
+void Clean_Data(byte *input_data) {
+	for (uint8_t i = 0; i < FRAME_SIZE; i++) {
 		input_data[i] = 0;
 	}
+}
+
+byte GetCRC8Index(byte *input_data) {
+	uint8_t x = 0;
+	
+	for (uint8_t i = 0; i < FRAME_SIZE; i++) {
+		if (input_data[i] == END_LINE) {
+			return i - 1;	
+		}
+		
+		x++;
+	}
+	
+	return x;
 }
 
 int main(void) {
 	DDRB = 0xFF; //PORTC as Output
 	
-	BYTE input[FRAME_SIZE] = { 0 };
+	byte input[FRAME_SIZE] = { 0 };
 	USART_Init();       
 	
 	while(1) {
 		USART_Receive_Str(input);
+		byte index_crc8 = GetCRC8Index(input);
+		
+		//input[1] = index_crc8;
 		
 		blink();
 		
@@ -141,7 +162,7 @@ int main(void) {
 		input_str[8] = crc_value;
 		*/
 		
-		input[7] = Crc8(input, 7);
+		input[index_crc8] = Crc8(input, index_crc8);
 		
 		USART_Transmit_Str(input);
 		USART_Transmit_Str("\r");

@@ -3,6 +3,8 @@
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/pgmspace.h>
+#include <avr/wdt.h>
+#include <avr/interrupt.h>
 
 typedef unsigned char byte;
 
@@ -108,9 +110,9 @@ void USART_Transmit_Str(byte *calledstring) {
 
 void blink() {
 	PORTB = 0xFF;
-	_delay_ms(100);
+	_delay_ms(35);
 	PORTB= 0x00;
-	_delay_ms(100);
+	_delay_ms(35);
 }
 
 void Clean_Data(byte *input_data) {
@@ -134,6 +136,9 @@ byte GetCRC8Index(byte *input_data) {
 }
 
 int main(void) {
+	
+	wdt_enable (WDTO_8S);
+	
 	DDRB = 0xFF; //PORTC as Output
 	
 	byte input[FRAME_SIZE] = { 0 };
@@ -168,6 +173,8 @@ int main(void) {
 		USART_Transmit_Str("\r");
 
 		Clean_Data(input);
+		
+		wdt_reset();
 	}
 	
 	return 0;

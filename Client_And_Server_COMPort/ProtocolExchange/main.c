@@ -110,9 +110,9 @@ void USART_Transmit_Str(byte *calledstring) {
 
 void blink() {
 	PORTB = 0xFF;
-	_delay_ms(35);
+	_delay_ms(25);
 	PORTB= 0x00;
-	_delay_ms(35);
+	_delay_ms(25);
 }
 
 void Clean_Data(byte *input_data) {
@@ -135,9 +135,25 @@ byte GetCRC8Index(byte *input_data) {
 	return x;
 }
 
+ISR(WDT_vect) {
+	
+	wdt_reset();
+	
+	WDTCSR = 1 << WDIE;
+	
+	blink();
+}
+
 int main(void) {
 	
-	wdt_enable (WDTO_8S);
+	sei();
+	wdt_enable(WDTO_8S);
+	WDTCSR = 1 << WDIE;
+	
+	//wdt_disable();
+	//wdt_enable (WDTO_15MS);
+	//setup_watchdog(WDTO_1S);
+	//sei();      // разрешить прерывания
 	
 	DDRB = 0xFF; //PORTC as Output
 	
@@ -150,7 +166,7 @@ int main(void) {
 		
 		//input[1] = index_crc8;
 		
-		blink();
+		//blink();
 		
 		/*
 		unsigned char input_str[FRAME_SIZE] = { 0 };
@@ -174,7 +190,7 @@ int main(void) {
 
 		Clean_Data(input);
 		
-		wdt_reset();
+		//wdt_reset();
 	}
 	
 	return 0;

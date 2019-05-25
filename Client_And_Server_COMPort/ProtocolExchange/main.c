@@ -8,9 +8,9 @@
 
 typedef unsigned char byte;
 
-// (Из таблицы Examples of UBRRn Settings for ATmega328P "7 - 256000 Baud" или 207 - 9600)
+// (Из таблицы Examples of UBRRn Settings for ATmega328P U2X=1 "7 - 256000 Baud" или 207 - 9600)
 //#define BAUD_PRESCALE 207
-#define BAUD_PRESCALE 7
+#define BAUD_PRESCALE 3
 
 #define FRAME_SIZE 32
 #define END_LINE 13
@@ -63,17 +63,25 @@ uint8_t Crc8(uint8_t *pcBlock, uint8_t len) {
 }
 
 void USART_Init() {
-	UBRR0H = BAUD_PRESCALE >> 8;
-	UBRR0L = BAUD_PRESCALE;
+	sei();
 	
-	UCSR0A |= (1<<U2X0); //Удвоение частоты
+	wdt_enable(WDTO_2S);
+	
+	WDTCSR = 1<<WDIE;
+	
+	//UCSR0A |= (1<<U2X0); //Удвоение частоты
 	UCSR0B = (1<<RXEN0) | (1<<TXEN0); //Разрешаем прием и передачу по USART - T/R ENable = True
 	UCSR0C = (0<<UMSEL01) | (0<<UMSEL00) | (1<<USBS0) | (1<<UCSZ00) | (1<<UCSZ01) | (1 << UCSZ00);
+
+	UBRR0H = BAUD_PRESCALE >> 8;
+	UBRR0L = BAUD_PRESCALE;
+
+	_delay_ms(20);
 }
 
 byte USART_Receive(void) {	
 	while( !(UCSR0A & (1<<RXC0)) );
-	return UDR0;
+	return UDR0;	
 }
 
 void USART_Receive_Str(byte *calledstring) {
@@ -108,11 +116,18 @@ void USART_Transmit_Str(byte *calledstring) {
 	}
 }
 
+void blink_WD() {
+	PORTB |= ( 1 << PINB4 ); //0xFF; //Весь порт On
+	_delay_ms(1);
+	PORTB &= ~( 1 << PINB4 ); //0x00; //Весь порт OFF
+	_delay_ms(1);
+}
+
 void blink() {
-	PORTB = 0xFF;
-	_delay_ms(25);
-	PORTB= 0x00;
-	_delay_ms(25);
+	PORTB |= ( 1 << PINB5 ); //0xFF; //Весь порт On
+	_delay_ms(5);
+	PORTB &= ~( 1 << PINB5 ); //0x00; //Весь порт OFF
+	_delay_ms(5);
 }
 
 void Clean_Data(byte *input_data) {
@@ -122,8 +137,7 @@ void Clean_Data(byte *input_data) {
 }
 
 byte GetCRC8Index(byte *input_data) {
-	uint8_t x = 0;
-	
+	uint8_t x = 0;	
 	for (uint8_t i = 0; i < FRAME_SIZE; i++) {
 		if (input_data[i] == END_LINE) {
 			return i - 1;	
@@ -138,22 +152,13 @@ byte GetCRC8Index(byte *input_data) {
 ISR(WDT_vect) {
 	
 	wdt_reset();
+
+	USART_Init();
 	
-	WDTCSR = 1 << WDIE;
-	
-	blink();
+	blink_WD();
 }
 
 int main(void) {
-	
-	sei();
-	wdt_enable(WDTO_8S);
-	WDTCSR = 1 << WDIE;
-	
-	//wdt_disable();
-	//wdt_enable (WDTO_15MS);
-	//setup_watchdog(WDTO_1S);
-	//sei();      // разрешить прерывания
 	
 	DDRB = 0xFF; //PORTC as Output
 	
@@ -166,7 +171,7 @@ int main(void) {
 		
 		//input[1] = index_crc8;
 		
-		//blink();
+		blink();
 		
 		/*
 		unsigned char input_str[FRAME_SIZE] = { 0 };
@@ -189,8 +194,6 @@ int main(void) {
 		USART_Transmit_Str("\r");
 
 		Clean_Data(input);
-		
-		//wdt_reset();
 	}
 	
 	return 0;

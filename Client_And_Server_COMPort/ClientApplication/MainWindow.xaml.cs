@@ -25,6 +25,10 @@ namespace ArduinoDeamon
 
         private void InitComPort(string com_port)
         {
+            //Add record 25.05.2019
+            if (serial_port != null)
+                serial_port.Close();
+
             if (serial_port != null && serial_port.IsOpen)
             {
                 serial_port.Close();
@@ -126,6 +130,8 @@ namespace ArduinoDeamon
         {
             try
             {
+                Random rand = new Random();
+
                 this.Dispatcher.Invoke((Action)(() =>
                 {
                     this.btn_start.IsEnabled = false;
@@ -142,15 +148,18 @@ namespace ArduinoDeamon
                 msg[6] = (char)154;
                 msg[7] = (char)155;
                 msg[8] = (char)0;
+
                 msg[16] = '\r';
             
-                for (int i = 0; i < 1000000; i++)
+                for (int i = 0; i < 500000; i++)
                 {
+                    msg[10] = (char)rand.Next(256);
+
                     CheckEndChar(msg, (byte)i);
 
                     byte[] temp = msg.Select(c => (byte)c).ToArray();
 
-                    PortWrite(temp);
+                    PortWrite(i, temp);
                 }
             }
             finally
@@ -170,7 +179,7 @@ namespace ArduinoDeamon
             thraed.Start();
         }
 
-        private void PortWrite(byte[] src_msg_chars)
+        private void PortWrite(int index, byte[] src_msg_chars)
         {
             int index_crc8 = src_msg_chars.Length - 2; //2 crars - 'crc8' char and '\r' char
 
@@ -214,7 +223,9 @@ namespace ArduinoDeamon
             {
                 string time = DateTime.Now.ToString("dd/MM/yy HH:mm:ss fff");
                 //this.msg_list.Items.Add($"{time}: Message '{message}' ({(hash.Trim().Equals(result.Trim()) ? "TRUE" : "FALSE")})");
-                this.msg_list.Items.Add($"{time}: ==> '{temp_src_msg}' and '{temp_res_msg}'");
+                this.msg_list.Items.Add($"{time} [{index.ToString("000000000")}] : ==> '{temp_src_msg}' and '{temp_res_msg}'");
+                //this.msg_list.SelectedIndex = this.msg_list.Items.Count;
+                this.msg_list.ScrollIntoView(this.msg_list.Items[this.msg_list.Items.Count - 1]);
             }));
 
             //Очистим буфер Out после приема данных

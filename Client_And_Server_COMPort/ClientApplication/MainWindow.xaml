@@ -13,6 +13,19 @@
         </Grid.ColumnDefinitions>
         <Button x:Name="btn_start" Content="Start test" Margin="338,54,339,0" VerticalAlignment="Top" Click="Btn_on_Click" Height="22"/>
         <ListView x:Name="msg_list" Margin="10,134,10,10">
+            <ListView.Resources>
+                <Style TargetType="{x:Type ListViewItem}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsError}" Value="False">
+                            <Setter Property="Background" Value="#FFCDFB96" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding IsError}" Value="True">
+                            <Setter Property="Background" Value="#FFF79A9A" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ListView.Resources>
+
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="ID" Width="55" DisplayMemberBinding="{Binding Index}" />

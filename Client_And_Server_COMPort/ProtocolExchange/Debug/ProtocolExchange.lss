@@ -17,7 +17,7 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING
   6 .debug_abbrev 000007d8  00000000  00000000  000010dc  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_line   0000054a  00000000  00000000  000018b4  2**0
+  7 .debug_line   00000549  00000000  00000000  000018b4  2**0
                   CONTENTS, READONLY, DEBUGGING
   8 .debug_frame  00000160  00000000  00000000  00001e00  2**2
                   CONTENTS, READONLY, DEBUGGING
@@ -85,11 +85,11 @@ Disassembly of section .text:
   92:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
 
 00000096 <Crc8>:
+	0x3B, 0x0A, 0x59, 0x68, 0xFF, 0xCE, 0x9D, 0xAC
+};
 
 uint8_t Crc8(uint8_t *pcBlock, uint8_t len) {
-
-	uint8_t crc = 0xFF;
-	
+	uint8_t crc = 0xFF;	
 	for (int i = 0; i < len; i++) {		
   96:	66 23       	and	r22, r22
   98:	81 f0       	breq	.+32     	; 0xba <Crc8+0x24>
@@ -107,22 +107,22 @@ uint8_t Crc8(uint8_t *pcBlock, uint8_t len) {
   ac:	ee 5f       	subi	r30, 0xFE	; 254
   ae:	fe 4f       	sbci	r31, 0xFE	; 254
   b0:	80 81       	ld	r24, Z
+	0x3B, 0x0A, 0x59, 0x68, 0xFF, 0xCE, 0x9D, 0xAC
+};
 
 uint8_t Crc8(uint8_t *pcBlock, uint8_t len) {
-
-	uint8_t crc = 0xFF;
-	
+	uint8_t crc = 0xFF;	
 	for (int i = 0; i < len; i++) {		
   b2:	a2 17       	cp	r26, r18
   b4:	b3 07       	cpc	r27, r19
   b6:	b1 f7       	brne	.-20     	; 0xa4 <Crc8+0xe>
   b8:	08 95       	ret
+	0x82, 0xB3, 0xE0, 0xD1, 0x46, 0x77, 0x24, 0x15,
 	0x3B, 0x0A, 0x59, 0x68, 0xFF, 0xCE, 0x9D, 0xAC
 };
 
 uint8_t Crc8(uint8_t *pcBlock, uint8_t len) {
-
-	uint8_t crc = 0xFF;
+	uint8_t crc = 0xFF;	
   ba:	8f ef       	ldi	r24, 0xFF	; 255
 		//crc = pgm_read_byte(&Crc8Table[crc ^ *pcBlock++]);
 		crc = Crc8Table[crc ^ *pcBlock++];
@@ -164,12 +164,12 @@ void USART_Init() {
 	UCSR0C = (0<<UMSEL01) | (0<<UMSEL00) | (1<<USBS0) | (1<<UCSZ00) | (1<<UCSZ01) | (1 << UCSZ00);
   de:	8e e0       	ldi	r24, 0x0E	; 14
   e0:	80 93 c2 00 	sts	0x00C2, r24	; 0x8000c2 <__TEXT_REGION_LENGTH__+0x7e00c2>
-
-	UBRR0H = BAUD_PRESCALE >> 8;
-  e4:	10 92 c5 00 	sts	0x00C5, r1	; 0x8000c5 <__TEXT_REGION_LENGTH__+0x7e00c5>
+	
 	UBRR0L = BAUD_PRESCALE;
-  e8:	83 e0       	ldi	r24, 0x03	; 3
-  ea:	80 93 c4 00 	sts	0x00C4, r24	; 0x8000c4 <__TEXT_REGION_LENGTH__+0x7e00c4>
+  e4:	83 e0       	ldi	r24, 0x03	; 3
+  e6:	80 93 c4 00 	sts	0x00C4, r24	; 0x8000c4 <__TEXT_REGION_LENGTH__+0x7e00c4>
+	UBRR0H = BAUD_PRESCALE >> 8;
+  ea:	10 92 c5 00 	sts	0x00C5, r1	; 0x8000c5 <__TEXT_REGION_LENGTH__+0x7e00c5>
 	#else
 		//round up by default
 		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
@@ -467,7 +467,6 @@ ISR(WDT_vect) {
  228:	bf 93       	push	r27
  22a:	ef 93       	push	r30
  22c:	ff 93       	push	r31
-	
 	wdt_reset();
  22e:	a8 95       	wdr
 
@@ -508,7 +507,6 @@ int main(void) {
  268:	de bf       	out	0x3e, r29	; 62
  26a:	0f be       	out	0x3f, r0	; 63
  26c:	cd bf       	out	0x3d, r28	; 61
-	
 	DDRB = 0xFF; //PORTC as Output
  26e:	8f ef       	ldi	r24, 0xFF	; 255
  270:	84 b9       	out	0x04, r24	; 4

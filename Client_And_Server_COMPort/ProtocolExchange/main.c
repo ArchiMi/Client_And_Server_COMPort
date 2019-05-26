@@ -9,8 +9,8 @@
 typedef unsigned char byte;
 
 // (Из таблицы Examples of UBRRn Settings for ATmega328P U2X=1 "7 - 256000 Baud" или 207 - 9600)
-//#define BAUD_PRESCALE 207
-#define BAUD_PRESCALE 3
+//#define BAUD_PRESCALE 207 //207 - 9600 U2X=1
+#define BAUD_PRESCALE 3 //3 - 256000 U2X=0
 
 #define FRAME_SIZE 32
 #define END_LINE 13
@@ -51,9 +51,7 @@ const byte Crc8Table[] = {
 };
 
 uint8_t Crc8(uint8_t *pcBlock, uint8_t len) {
-
-	uint8_t crc = 0xFF;
-	
+	uint8_t crc = 0xFF;	
 	for (int i = 0; i < len; i++) {		
 		//crc = pgm_read_byte(&Crc8Table[crc ^ *pcBlock++]);
 		crc = Crc8Table[crc ^ *pcBlock++];
@@ -72,9 +70,9 @@ void USART_Init() {
 	//UCSR0A |= (1<<U2X0); //Удвоение частоты
 	UCSR0B = (1<<RXEN0) | (1<<TXEN0); //Разрешаем прием и передачу по USART - T/R ENable = True
 	UCSR0C = (0<<UMSEL01) | (0<<UMSEL00) | (1<<USBS0) | (1<<UCSZ00) | (1<<UCSZ01) | (1 << UCSZ00);
-
-	UBRR0H = BAUD_PRESCALE >> 8;
+	
 	UBRR0L = BAUD_PRESCALE;
+	UBRR0H = BAUD_PRESCALE >> 8;
 
 	_delay_ms(20);
 }
@@ -150,7 +148,6 @@ byte GetCRC8Index(byte *input_data) {
 }
 
 ISR(WDT_vect) {
-	
 	wdt_reset();
 
 	USART_Init();
@@ -159,7 +156,6 @@ ISR(WDT_vect) {
 }
 
 int main(void) {
-	
 	DDRB = 0xFF; //PORTC as Output
 	
 	byte input[FRAME_SIZE] = { 0 };

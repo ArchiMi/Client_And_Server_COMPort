@@ -5,21 +5,33 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ArduinoDeamon"
         mc:Ignorable="d"
-        Title="MainWindow" Height="644.906" Width="681.22" Closed="Window_Closed" Closing="Window_Closing">
+        Title="MainWindow" Height="644.906" Width="1203.889" Closed="Window_Closed" Closing="Window_Closing">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
             <ColumnDefinition Width="0*"/>
         </Grid.ColumnDefinitions>
-        <Button x:Name="btn_start" Content="Start test" Margin="140,54,140,0" VerticalAlignment="Top" Click="Btn_on_Click" Height="22"/>
+        <Button x:Name="btn_start" Content="Start test" Margin="338,54,339,0" VerticalAlignment="Top" Click="Btn_on_Click" Height="22"/>
         <ListView x:Name="msg_list" Margin="10,134,10,10">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn/>
+                    <GridViewColumn Header="ID" Width="55" DisplayMemberBinding="{Binding Index}" />
+                    <GridViewColumn Header="Дата/Время" Width="145" DisplayMemberBinding="{Binding DateTimeOperation, StringFormat={}{0:dd.MM.yyyy H:mm:ss fff}}" />
+                    <GridViewColumn Header="Команда" Width="80" DisplayMemberBinding="{Binding CMD}" />
+                    <GridViewColumn Header="Статус" Width="50" DisplayMemberBinding="{Binding Status}" />
+                    <GridViewColumn Header="Ошибка" Width="55" DisplayMemberBinding="{Binding IsError}" />
+                    <GridViewColumn Header="Описание" Width="640" DisplayMemberBinding="{Binding Message}" />
+                    <GridViewColumn Header="Balance" Width="50">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Balance}" TextAlignment="Right" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                 </GridView>
             </ListView.View>
         </ListView>
-        <Button x:Name="btn_clear" Content="Clean All" Margin="140,81,140,0" VerticalAlignment="Top" Click="Button_Click_2" Height="22"/>
-        <ComboBox x:Name="cb_ComPorts" Margin="140,27,140,0" VerticalAlignment="Top"/>
+        <Button x:Name="btn_clear" Content="Clean All" Margin="338,81,339,0" VerticalAlignment="Top" Click="Button_Click_2" Height="22"/>
+        <ComboBox x:Name="cb_ComPorts" Margin="338,27,339,0" VerticalAlignment="Top"/>
     </Grid>
 </Window>

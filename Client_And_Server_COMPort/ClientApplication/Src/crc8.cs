@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ArduinoDeamon.Src
 {
-    public class crc8
+    public class CRC8
     {
         private readonly byte[] crc8Table = new byte[]
         {

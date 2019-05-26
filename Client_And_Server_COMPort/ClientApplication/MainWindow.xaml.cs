@@ -1,6 +1,8 @@
 ﻿using ArduinoDeamon.Src;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data;
 using System.IO;
 using System.IO.Ports;
 using System.Linq;
@@ -19,13 +21,42 @@ namespace ArduinoDeamon
         private const int FRAME_LENGTH = 17;
 
         private SerialPort serial_port;
-        private crc8 sum;
-        private Thread thraed;
+        private CRC8 sum;
+        private Thread thread;
         private string com_port;
+        private DataTable table;
+
+        public MainWindow()
+        {
+            InitializeComponent();
+
+            this.msg_list.DataContext = CreateDataTable();
+
+            this.sum = new CRC8();
+            if (LoadListComPorts() > 0)
+            {
+                this.com_port = (string)cb_ComPorts.SelectedValue;
+            }
+        }
+
+        DataTable CreateDataTable()
+        {
+            this.table = new DataTable("Customers");
+
+            this.table.Columns.Add("Index", typeof(int));
+            this.table.Columns.Add("DateTimeOperation", typeof(DateTime));
+            this.table.Columns.Add("CMD", typeof(string));
+            this.table.Columns.Add("Status", typeof(string));
+            this.table.Columns.Add("IsError", typeof(bool));
+            this.table.Columns.Add("Message", typeof(string));
+            this.table.Columns.Add("Balance", typeof(decimal));
+
+            return table;
+        }
 
         private void InitComPort(string com_port)
         {
-            //Add record 25.05.2019
+            // Add record 25.05.2019
             if (serial_port != null)
                 serial_port.Close();
 
@@ -70,44 +101,6 @@ namespace ArduinoDeamon
             return cb_ComPorts.Items.Count;
         }
 
-        public MainWindow()
-        {
-            InitializeComponent();
-
-            this.sum = new crc8();
-            if (LoadListComPorts() > 0)
-            {
-                this.com_port = (string)cb_ComPorts.SelectedValue;
-                InitComPort(this.com_port);
-            }
-        }
-
-        /*
-        private void port_DataReceived(object sender, SerialDataReceivedEventArgs e)
-        {
-            try
-            {
-                SerialPort sp = (SerialPort)sender;
-                string message = sp.ReadLine();
-
-                Dispatcher.BeginInvoke((Action)delegate
-                {
-                    this.msg_list.Items.Add($"<= Receive: {message}");
-                });
-            }
-            catch (TimeoutException)
-            {
-
-            }
-        }
-        */
-
-        private void Window_Closed(object sender, EventArgs e)
-        {
-            if (serial_port != null && serial_port.IsOpen)
-                serial_port.Close();
-        }
-
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
             msg_list.Items.Clear();
@@ -119,8 +112,6 @@ namespace ArduinoDeamon
 
             for (int i = 0; i < msg.Length - 1; i++)
             {
-                //msg[i] = (char)i; //Convert.ToChar(temp_str);
-
                 if (msg[i] == '\0' || msg[i] == '\r' || msg[i] > 255)
                     msg[i] = (char)1;
             }
@@ -130,6 +121,8 @@ namespace ArduinoDeamon
         {
             try
             {
+                InitComPort(this.com_port);
+
                 Random rand = new Random();
 
                 this.Dispatcher.Invoke((Action)(() =>
@@ -153,6 +146,7 @@ namespace ArduinoDeamon
             
                 for (int i = 0; i < 500000; i++)
                 {
+                    // Временное произвольное значение в качестве одного из параметров, для проверки CRC8
                     msg[10] = (char)rand.Next(256);
 
                     CheckEndChar(msg, (byte)i);
@@ -174,34 +168,34 @@ namespace ArduinoDeamon
 
         private void Btn_on_Click(object sender, RoutedEventArgs e)
         {
-            thraed = new Thread(DoStart);
-            thraed.IsBackground = true;
-            thraed.Start();
+            thread = new Thread(DoStart);
+            thread.IsBackground = true;
+            thread.Start();
         }
 
-        private void PortWrite(int index, byte[] src_msg_chars)
+        private void PortWrite(int index, byte[] transmit_msg_chars)
         {
-            int index_crc8 = src_msg_chars.Length - 2; //2 crars - 'crc8' char and '\r' char
+            int index_crc8 = transmit_msg_chars.Length - 2; //2 crars - 'crc8' char and '\r' char
 
-            //Очистим буфер In перед отправкой данных
+            // Очистим буфер In перед отправкой данных
             if (serial_port.IsOpen)
                 serial_port.DiscardInBuffer();
 
-            //Get CRC8
-            src_msg_chars[index_crc8] = this.sum.Crc8Bytes(src_msg_chars, index_crc8);
-            string temp_src_msg = string.Join(",", src_msg_chars.Select(p => p.ToString()).ToArray());
+            // Get CRC8
+            transmit_msg_chars[index_crc8] = this.sum.Crc8Bytes(transmit_msg_chars, index_crc8);
+            string temp_transmit_msg = string.Join(",", transmit_msg_chars.Select(p => p.ToString()).ToArray());
 
-            //Write
+            // Write
             try
             {
-                serial_port.Write(src_msg_chars, 0, src_msg_chars.Count());
+                serial_port.Write(transmit_msg_chars, 0, transmit_msg_chars.Count());
             }
             catch (InvalidOperationException ex)
             {
                 MessageBox.Show(ex.Message);
             }
 
-            //Read
+            // Read
             char[] result = new char[FRAME_LENGTH];
             try
             {
@@ -218,17 +212,22 @@ namespace ArduinoDeamon
                 
             string temp_res_msg = string.Join(",", result.Select(x => ((byte)x).ToString()).ToArray());
 
-            //Log
+            // Log
             this.Dispatcher.Invoke((Action)(() =>
             {
                 string time = DateTime.Now.ToString("dd/MM/yy HH:mm:ss fff");
-                //this.msg_list.Items.Add($"{time}: Message '{message}' ({(hash.Trim().Equals(result.Trim()) ? "TRUE" : "FALSE")})");
-                this.msg_list.Items.Add($"{time} [{index.ToString("000000000")}] : ==> '{temp_src_msg}' and '{temp_res_msg}'");
-                //this.msg_list.SelectedIndex = this.msg_list.Items.Count;
+                //string message = $"[{index.ToString("000000000")}] : ==> '{temp_src_msg}' and '{temp_res_msg}'";
+                string message = $" => '{temp_transmit_msg}' and '{temp_res_msg}'";
+
+                char transmit_crc8_char = temp_transmit_msg[temp_transmit_msg.Length - 2];
+                char receiv_crc8_char = temp_res_msg[temp_res_msg.Length - 2];
+                bool is_error = transmit_crc8_char == receiv_crc8_char;
+
+                this.msg_list.Items.Add(new ItemRecord(index, DateTime.Now, "1", message, "ping", !is_error));
                 this.msg_list.ScrollIntoView(this.msg_list.Items[this.msg_list.Items.Count - 1]);
             }));
 
-            //Очистим буфер Out после приема данных
+            // Очистим буфер Out после приема данных
             if (serial_port.IsOpen)
                 serial_port.DiscardOutBuffer();            
         }
@@ -253,9 +252,43 @@ namespace ArduinoDeamon
             }
         }
 
+
+
+        #region COM_PORT_RECEIVED
+        /*
+        private void port_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        {
+            try
+            {
+                SerialPort sp = (SerialPort)sender;
+                string message = sp.ReadLine();
+
+                Dispatcher.BeginInvoke((Action)delegate
+                {
+                    this.msg_list.Items.Add($"<= Receive: {message}");
+                });
+            }
+            catch (TimeoutException)
+            {
+
+            }
+        }
+        */
+        #endregion
+
+        #region Window function
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            if (serial_port != null && serial_port.IsOpen)
+                serial_port.Close();
+        }
+
         private void Window_Closing(object sender, CancelEventArgs e)
         {
             //thraed.Suspend();
         }
+
+        #endregion
     }
 }

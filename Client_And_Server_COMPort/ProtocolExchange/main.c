@@ -5,6 +5,7 @@
 #include <avr/pgmspace.h>
 #include <avr/wdt.h>
 #include <avr/interrupt.h>
+#include <stdbool.h>
 
 typedef unsigned char byte;
 
@@ -63,7 +64,17 @@ uint8_t Crc8(uint8_t *pcBlock, uint8_t len) {
 void USART_Init() {
 	sei();
 	
-	wdt_enable(WDTO_2S);
+	//BEGIN Test	
+	wdt_disable();
+	
+	bool WD_RST = MCUSR & 0x08;
+	bool BO_RST = MCUSR & 0x04;
+	bool EXT_RST = MCUSR & 0x02;
+	bool PON_RST = MCUSR & 0x01;
+	MCUSR = MCUSR & 0xF0;
+	//END Test
+		
+	wdt_enable(WDTO_8S);
 	
 	WDTCSR = 1<<WDIE;
 	

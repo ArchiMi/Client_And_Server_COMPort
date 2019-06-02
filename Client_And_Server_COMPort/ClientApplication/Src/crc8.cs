@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ArduinoDeamon.Src
+namespace ClientAppNameSpace.Src
 {
     public class CRC8
     {

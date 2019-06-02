@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ArduinoDeamon.Src
+namespace ClientAppNameSpace.Src
 {
     public class ItemRecord
     {
@@ -14,6 +14,7 @@ namespace ArduinoDeamon.Src
         private bool _is_error;
         private string _message;
         private string _cmd;
+        private decimal _balance;
 
         public int Index
         {
@@ -45,6 +46,11 @@ namespace ArduinoDeamon.Src
             get { return this._cmd; }
         }
 
+        public decimal Balance
+        {
+            get { return this._balance; }
+        }
+
         public ItemRecord(int index, DateTime date_time, string status, string message, string cmd, bool is_error)
         {
             this._index = index;
@@ -53,6 +59,7 @@ namespace ArduinoDeamon.Src
             this._message = message;
             this._cmd = cmd;
             this._is_error = is_error;
+            this._balance = 0.00M;
         }
     }
 }

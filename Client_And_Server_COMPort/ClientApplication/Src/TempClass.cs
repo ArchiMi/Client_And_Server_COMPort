@@ -32,30 +32,37 @@ namespace ClientAppNameSpace.Src
 
         public void InitComPort()
         {
-            if (this._serial_port != null && this._serial_port.IsOpen)
+            try
             {
-                this._serial_port.Close();
-                this._serial_port = null;
+                if (this._serial_port != null && this._serial_port.IsOpen)
+                {
+                    this._serial_port.Close();
+                    this._serial_port = null;
+                }
+
+                if (this._serial_port == null)
+                    this._serial_port = new SerialPort(this._com_port_data);
+
+                //4800, 9600, 19200, 38400, 57600, 115200
+                this._serial_port.BaudRate = _baud;
+                //serial_port.BaudRate = 9600;
+
+                this._serial_port.Parity = Parity.None;
+                this._serial_port.DataBits = 8;
+
+                this._serial_port.StopBits = StopBits.Two;
+                this._serial_port.ReadTimeout = 10000; //-1 200
+                this._serial_port.WriteTimeout = 10000; //-1 50
+                this._serial_port.Handshake = Handshake.None;
+                this._serial_port.Encoding = Encoding.Default;
+                //serial_port.DataReceived += new SerialDataReceivedEventHandler(port_DataReceived);
+
+                this._serial_port.Open();
             }
-
-            if (this._serial_port == null)
-                this._serial_port = new SerialPort(this._com_port_data);
-
-            //4800, 9600, 19200, 38400, 57600, 115200
-            this._serial_port.BaudRate = _baud;
-            //serial_port.BaudRate = 9600;
-
-            this._serial_port.Parity = Parity.None;
-            this._serial_port.DataBits = 8;
-
-            this._serial_port.StopBits = StopBits.Two;
-            this._serial_port.ReadTimeout = 10000; //-1 200
-            this._serial_port.WriteTimeout = 10000; //-1 50
-            this._serial_port.Handshake = Handshake.None;
-            this._serial_port.Encoding = Encoding.Default;
-            //serial_port.DataReceived += new SerialDataReceivedEventHandler(port_DataReceived);
-
-            this._serial_port.Open();
+            catch (Exception ex)
+            {
+                this._log.WriteError($"Init func exception: {ex.Message}");
+            }
         }
 
         public void CheckEndChar(char[] msg, byte value)
@@ -71,79 +78,89 @@ namespace ClientAppNameSpace.Src
 
         public string WriteBytes(int index, byte[] transmit_msg_chars)
         {
-            int index_crc8 = transmit_msg_chars.Length - 2; // 2 crars - 'crc8' char and '\r' char
-
-            // Очистим буфер In перед отправкой данных
-            if (this._serial_port.IsOpen)
-                this._serial_port.DiscardInBuffer();
-
-            // Get CRC8
-            transmit_msg_chars[index_crc8] = this._sum.Crc8Bytes(transmit_msg_chars, index_crc8);
-            string temp_transmit_msg = string.Join(",", transmit_msg_chars.Select(p => p.ToString()).ToArray());
-
-            // Write
             try
-            {
-                this._serial_port.Write(transmit_msg_chars, 0, transmit_msg_chars.Count());
-            }
-            catch (InvalidOperationException ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
+            { 
+                int index_crc8 = transmit_msg_chars.Length - 2; // 2 crars - 'crc8' char and '\r' char
 
-            this._log.WriteInfo($"Write: {temp_transmit_msg}");
-            return temp_transmit_msg;
+                // Очистим буфер In перед отправкой данных
+                if (this._serial_port.IsOpen)
+                    this._serial_port.DiscardInBuffer();
+
+                // Get CRC8
+                transmit_msg_chars[index_crc8] = this._sum.Crc8Bytes(transmit_msg_chars, index_crc8);
+                string temp_transmit_msg = string.Join(",", transmit_msg_chars.Select(p => p.ToString()).ToArray());
+
+                this._serial_port.Write(transmit_msg_chars, 0, transmit_msg_chars.Count());
+
+                this._log.WriteInfo($"Write: {temp_transmit_msg}");
+
+                return temp_transmit_msg;
+            }
+            catch (Exception ex)
+            {
+                this._log.WriteError($"WriteBytes func exception: {ex.Message}");
+                throw new Exception("In WriteBytes");
+            }
         }
 
         public string ReadBytes()
         {
-            // Read
-            char[] result = new char[Const.FRAME_LENGTH];
             try
-            {
-                int i = 0;
-                int x = 0;
-
+            { 
+                char[] result = new char[Const.FRAME_LENGTH];
                 try
                 {
-                    do
+                    int i = 0;
+                    int x = 0;
+
+                    try
                     {
-                        x = this._serial_port.ReadByte();
-                        result[i++] = (char)x;
+                        do
+                        {
+                            x = this._serial_port.ReadByte();
+                            result[i++] = (char)x;
 
-                    } while (x != '\r' || i == result.Length - 1);
+                        } while (x != '\r' || i == result.Length - 1);
+                    }
+                    catch (IndexOutOfRangeException ex)
+                    {
+                        //MessageBox.Show($"{ex.Message} (index={i})");
+                    }
+                    catch (Exception ex)
+                    {
+                        //MessageBox.Show($"{ex.Message} (index={i})");
+                    }
                 }
-                catch (IndexOutOfRangeException ex)
+                catch (IOException)
                 {
-                    //MessageBox.Show($"{ex.Message} (index={i})");
+                    this.InitComPort();
                 }
-                catch (Exception ex)
+                catch (TimeoutException)
                 {
-                    //MessageBox.Show($"{ex.Message} (index={i})");
+                    this.InitComPort();
                 }
+
+                // Очистим буфер Out после приема данных
+                if (this._serial_port.IsOpen)
+                    this._serial_port.DiscardOutBuffer();
+
+                string res = string.Join(",", result.Select(x => ((byte)x).ToString()).ToArray());
+                this._log.WriteInfo($"Read: {res}");
+                return res;
             }
-            catch (IOException)
+            catch (Exception ex)
             {
-                this.InitComPort();
-            }
-            catch (TimeoutException)
-            {
-                this.InitComPort();
+                this._log.WriteError($"ReadBytes func exception: {ex.Message}");
             }
 
-            // Очистим буфер Out после приема данных
-            if (this._serial_port.IsOpen)
-                this._serial_port.DiscardOutBuffer();
-
-            string res = string.Join(",", result.Select(x => ((byte)x).ToString()).ToArray());
-            this._log.WriteInfo($"Read: {res}");
-            return res;
+            return "";
         }
 
         public void Dispose()
         {
-            if (this._serial_port != null && this._serial_port.IsOpen)
-                this._serial_port.Close();
+            if (this._serial_port != null)
+                if (this._serial_port.IsOpen)
+                    this._serial_port.Close();
         }
 
         #region COM_PORT_RECEIVED

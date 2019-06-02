@@ -27,4 +27,3 @@ C:\Projects\ClientServer\Client_And_Server_COMPort\ClientApplication\obj\Debug\C
 C:\Projects\ClientServer\Client_And_Server_COMPort\ClientApplication\obj\Debug\ClientAppNameSpace.Properties.Resources.resources
 C:\Projects\ClientServer\Client_And_Server_COMPort\ClientApplication\obj\Debug\ClientApp.exe
 C:\Projects\ClientServer\Client_And_Server_COMPort\ClientApplication\obj\Debug\ClientApp.pdb
-C:\Projects\ClientServer\Client_And_Server_COMPort\ClientApplication\obj\Debug\ApplicationMachine.csprojAssemblyReference.cache

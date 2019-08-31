@@ -4,3 +4,5 @@
 
 main.c
 
+Src\CRC8.c
+

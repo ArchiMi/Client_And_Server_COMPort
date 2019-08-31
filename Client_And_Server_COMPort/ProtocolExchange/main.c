@@ -6,22 +6,15 @@
 #include <avr/wdt.h>
 #include <avr/interrupt.h>
 #include <stdbool.h>
-//#include "Source/Types.h"
-#include "Source/Crc8.h"
 
 typedef unsigned char byte;
 
-// (Из таблицы Examples of UBRRn Settings for ATmega328P U2X=1 "7 - 256000 Baud" или 207 - 9600)
 //#define BAUD_PRESCALE 207 //207 - 9600 U2X=1
 #define BAUD_PRESCALE 3 //3 - 256000 U2X=0
 
 #define FRAME_SIZE 32
 #define END_LINE 13
 
-<<<<<<< HEAD
-
-=======
->>>>>>> origin
 void USART_Init() {
 	sei();
 	
@@ -39,8 +32,8 @@ void USART_Init() {
 	
 	WDTCSR = 1<<WDIE;
 	
-	//UCSR0A |= (1<<U2X0); //Удвоение частоты
-	UCSR0B = (1<<RXEN0) | (1<<TXEN0); //Разрешаем прием и передачу по USART - T/R ENable = True
+	//UCSR0A |= (1<<U2X0); //???????? ???????
+	UCSR0B = (1<<RXEN0) | (1<<TXEN0); //????????? ????? ? ???????? ?? USART - T/R ENable = True
 	UCSR0C = (0<<UMSEL01) | (0<<UMSEL00) | (1<<USBS0) | (1<<UCSZ00) | (1<<UCSZ01) | (1 << UCSZ00);
 	
 	UBRR0L = BAUD_PRESCALE;

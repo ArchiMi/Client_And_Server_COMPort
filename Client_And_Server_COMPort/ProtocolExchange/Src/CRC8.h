@@ -9,6 +9,8 @@
 #ifndef CRC8_H_
 #define CRC8_H_
 
+typedef unsigned char byte;
+
 uint8_t Crc8(uint8_t *pcBlock, uint8_t len)
 byte GetCRC8Index(byte *input_data)
 

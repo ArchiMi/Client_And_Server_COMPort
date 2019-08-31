@@ -139,15 +139,26 @@
     <Compile Include="main.c">
       <SubType>compile</SubType>
     </Compile>
+<<<<<<< HEAD
     <Compile Include="Src\CRC8.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Src\CRC8.h">
+=======
+    <Compile Include="Source\Crc8.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Source\Crc8.h">
+>>>>>>> origin
       <SubType>compile</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
+<<<<<<< HEAD
     <Folder Include="Src" />
+=======
+    <Folder Include="Source" />
+>>>>>>> origin
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
 </Project>

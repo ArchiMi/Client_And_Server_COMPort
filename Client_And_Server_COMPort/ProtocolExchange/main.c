@@ -6,6 +6,8 @@
 #include <avr/wdt.h>
 #include <avr/interrupt.h>
 #include <stdbool.h>
+//#include "Source/Types.h"
+#include "Source/Crc8.h"
 
 typedef unsigned char byte;
 
@@ -16,7 +18,10 @@ typedef unsigned char byte;
 #define FRAME_SIZE 32
 #define END_LINE 13
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin
 void USART_Init() {
 	sei();
 	
@@ -82,16 +87,16 @@ void USART_Transmit_Str(byte *calledstring) {
 }
 
 void blink_WD() {
-	PORTB |= ( 1 << PINB4 ); //0xFF; //Весь порт On
+	PORTB |= ( 1 << PINB4 ); //0xFF; //On
 	_delay_ms(1);
-	PORTB &= ~( 1 << PINB4 ); //0x00; //Весь порт OFF
+	PORTB &= ~( 1 << PINB4 ); //0x00; //OFF
 	_delay_ms(1);
 }
 
 void blink() {
-	PORTB |= ( 1 << PINB5 ); //0xFF; //Весь порт On
+	PORTB |= ( 1 << PINB5 ); //0xFF; //On
 	_delay_ms(5);
-	PORTB &= ~( 1 << PINB5 ); //0x00; //Весь порт OFF
+	PORTB &= ~( 1 << PINB5 ); //0x00; //OFF
 	_delay_ms(5);
 }
 
@@ -117,7 +122,7 @@ int main(void) {
 	
 	while(1) {
 		USART_Receive_Str(input);
-		byte index_crc8 = GetCRC8Index(input);
+		byte index_crc8 = GetCRC8Index(input, FRAME_SIZE, END_LINE);
 		
 		//input[1] = index_crc8;
 		

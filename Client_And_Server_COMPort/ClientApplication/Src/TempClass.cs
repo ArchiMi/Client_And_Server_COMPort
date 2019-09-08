@@ -67,11 +67,9 @@ namespace ClientAppNameSpace.Src
 
         public void CheckEndChar(char[] msg, byte value)
         {
-            msg[0] = (char)value;
-
             for (int i = 0; i < msg.Length - 1; i++)
             {
-                if (msg[i] == '\0' || msg[i] == '\r' || msg[i] > 255)
+                if (msg[i] == '\0' || msg[i] > 255)
                     msg[i] = (char)1;
             }
         }
@@ -80,7 +78,7 @@ namespace ClientAppNameSpace.Src
         {
             try
             { 
-                int index_crc8 = transmit_msg_chars.Length - 2; // 2 crars - 'crc8' char and '\r' char
+                int index_crc8 = transmit_msg_chars.Length - 4; // 3 crars - 'crc8' char and ':\r\n' char
 
                 // Очистим буфер In перед отправкой данных
                 if (this._serial_port.IsOpen)

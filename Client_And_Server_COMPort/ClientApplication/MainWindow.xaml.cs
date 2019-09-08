@@ -1,13 +1,8 @@
 ﻿using ClientAppNameSpace.Src;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.IO;
 using System.IO.Ports;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading;
 using System.Windows;
 
@@ -31,8 +26,6 @@ namespace ClientAppNameSpace
             //this.sum = new CRC8();
             if (LoadListComPorts() > 0) { }
                 //this.com_port_data = (string)cb_ComPorts.SelectedValue;
-
-
         }
 
         DataTable CreateDataTable()
@@ -84,29 +77,38 @@ namespace ClientAppNameSpace
                 //TEST
                 Random rand = new Random();
 
-                char[] msg = new char[Const.FRAME_LENGTH];
-                msg[0] = (char)148;
-                msg[1] = (char)149;
-                msg[2] = (char)150;
-                msg[3] = (char)151;
-                msg[4] = (char)152;
-                msg[5] = (char)153;
-                msg[6] = (char)154;
-                msg[7] = (char)155;
-                msg[8] = (char)0;
-
-                msg[16] = '\r';
-            
-                for (int i = 0; i < 10000000; i++)
+                for (int i = 0; i < 100000; i++)
                 {
-                    // Временное произвольное значение в качестве одного из параметров, для проверки CRC8
-                    msg[10] = (char)rand.Next(256);
+                    char[] msg = new char[Const.FRAME_LENGTH];
+                    msg[0] = ':';
+                    msg[1] = (char)i;
+                    msg[2] = (char)149;
+                    msg[3] = (char)150;
+                    msg[4] = (char)151;
+                    msg[5] = (char)152;
+                    msg[6] = (char)153;
+                    msg[7] = (char)154;
+                    msg[8] = (char)155;
+                    msg[9] = (char)0;
 
+                    // Временное произвольное значение в качестве одного из параметров, для проверки CRC8
+                    msg[11] = (char)rand.Next(256);
+
+                    msg[14] = ':';
+                    msg[15] = '\r';
+                    msg[16] = '\n';
+                    //msg[16] = '\n';
+
+                    // Проверка на служебные символы и что-то сделать с ним если вдруг символ обнаружен
                     tc_item.CheckEndChar(msg, (byte)i);
 
+                    // Array of char to Array of byte
                     byte[] temp = msg.Select(c => (byte)c).ToArray();
 
+                    // Send request
                     string temp_transmit_msg = tc_item.WriteBytes(i, temp);
+
+                    // Get response
                     string temp_res_msg = tc_item.ReadBytes();
 
                     // Log
@@ -131,7 +133,6 @@ namespace ClientAppNameSpace
 
                 this.Dispatcher.Invoke((Action)(() =>
                 {
-                    //this.btn_start.IsEnabled = true;
                     this.btn_clear.IsEnabled = true;
                 }));
             }

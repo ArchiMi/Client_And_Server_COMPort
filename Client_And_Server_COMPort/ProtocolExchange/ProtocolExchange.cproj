@@ -139,10 +139,10 @@
     <Compile Include="main.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="Src\CRC8.c">
+    <Compile Include="Src\Crc8.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="Src\CRC8.h">
+    <Compile Include="Src\Crc8.h">
       <SubType>compile</SubType>
     </Compile>
   </ItemGroup>

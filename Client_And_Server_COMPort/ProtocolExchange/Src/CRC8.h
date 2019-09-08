@@ -1,19 +1,16 @@
 /*
- * CRC8.h
+ * Crc8.h
  *
- * Created: 31.08.2019 17:14:39
+ * Created: 18.08.2019 13:04:34
  *  Author: Developer
  */ 
-
+typedef unsigned char byte;
 
 #ifndef CRC8_H_
 #define CRC8_H_
 
-typedef unsigned char byte;
-
-uint8_t Crc8(uint8_t *pcBlock, uint8_t len)
-byte GetCRC8Index(byte *input_data)
-
-
 
 #endif /* CRC8_H_ */
+
+uint8_t Crc8(uint8_t *pcBlock, uint8_t len);
+byte GetCRC8Index(byte *input_data, uint8_t frame_size, uint8_t end_line);

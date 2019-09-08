@@ -1,0 +1,1 @@
+Client_And_Server_COMPort\ClientApplication\bin\Debug\Logs

@@ -1,9 +1,10 @@
 /*
- * CRC8.c
+ * Crc8.c
  *
- * Created: 31.08.2019 17:14:06
+ * Created: 18.08.2019 13:04:17
  *  Author: Developer
  */ 
+#define F_CPU 16000000UL
 
 #include <avr/io.h>
 #include <util/delay.h>
@@ -11,9 +12,6 @@
 #include <avr/wdt.h>
 #include <avr/interrupt.h>
 #include <stdbool.h>
-
-#define FRAME_SIZE 32
-#define END_LINE 13
 
 typedef unsigned char byte;
 
@@ -62,10 +60,12 @@ uint8_t Crc8(uint8_t *pcBlock, uint8_t len) {
 	return crc;
 }
 
-byte GetCRC8Index(byte *input_data) {
+// frame_size = 32
+// end_line = 13
+byte GetCRC8Index(byte *input_data, uint8_t frame_size, uint8_t end_line) {
 	uint8_t x = 0;
-	for (uint8_t i = 0; i < FRAME_SIZE; i++) {
-		if (input_data[i] == END_LINE) {
+	for (uint8_t i = 0; i < frame_size; i++) {
+		if (input_data[i] == end_line) {
 			return i - 1;
 		}
 		

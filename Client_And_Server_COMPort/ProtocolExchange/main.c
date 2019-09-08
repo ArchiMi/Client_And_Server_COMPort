@@ -6,14 +6,18 @@
 #include <avr/wdt.h>
 #include <avr/interrupt.h>
 #include <stdbool.h>
+#include "Src/Crc8.h"
 
 typedef unsigned char byte;
 
+// In table 'Examples of UBRRn Settings' for ATmega328P U2X=1 "7 - 256000 Baud" or 207 - 9600
 //#define BAUD_PRESCALE 207 //207 - 9600 U2X=1
 #define BAUD_PRESCALE 3 //3 - 256000 U2X=0
 
 #define FRAME_SIZE 32
-#define END_LINE 13
+#define CHR_CARRET_RETURN 13
+#define CHR_LINE_FEED 10
+#define CHR_COLON 58
 
 void USART_Init() {
 	sei();
@@ -32,8 +36,8 @@ void USART_Init() {
 	
 	WDTCSR = 1<<WDIE;
 	
-	//UCSR0A |= (1<<U2X0); //???????? ???????
-	UCSR0B = (1<<RXEN0) | (1<<TXEN0); //????????? ????? ? ???????? ?? USART - T/R ENable = True
+	//UCSR0A |= (1<<U2X0); //Удвоение частоты
+	UCSR0B = (1<<RXEN0) | (1<<TXEN0); //Разрешаем прием и передачу по USART - T/R ENable = True
 	UCSR0C = (0<<UMSEL01) | (0<<UMSEL00) | (1<<USBS0) | (1<<UCSZ00) | (1<<UCSZ01) | (1 << UCSZ00);
 	
 	UBRR0L = BAUD_PRESCALE;
@@ -53,13 +57,25 @@ void USART_Receive_Str(byte *calledstring) {
 	int i = 0;	
 	while(1) {		
 		ch = USART_Receive();
-		
-		if (ch == END_LINE) {
-			calledstring[i] = END_LINE;	
+		if (ch == CHR_LINE_FEED) {
+			calledstring[i] = CHR_LINE_FEED;	
 			return;
 		} else {
 			calledstring[i] = ch;			
 		}
+		
+		/*
+		if (i > 0 && ch == CHR_LINE_FEED) {
+			if (calledstring[--i] == CHR_CARRET_RETURN) { //Проверить
+				calledstring[i] = CHR_LINE_FEED;
+				return;
+			} else {
+				calledstring[i] = ch;
+			}
+		} else {
+			calledstring[i] = ch;
+		}
+		*/
 		
 		i++;
 	}	
@@ -114,33 +130,23 @@ int main(void) {
 	USART_Init();       
 	
 	while(1) {
+		// Get message
 		USART_Receive_Str(input);
-		byte index_crc8 = GetCRC8Index(input, FRAME_SIZE, END_LINE);
 		
-		//input[1] = index_crc8;
+		// Get CRC8 index
+		byte index_crc8 = GetCRC8Index(input, FRAME_SIZE, CHR_COLON);
 		
+		// Information Blink
 		blink();
 		
-		/*
-		unsigned char input_str[FRAME_SIZE] = { 0 };
-		input_str[0] = '0';
-		input_str[1] = '1';
-		input_str[2] = '2';
-		input_str[3] = '3';
-		input_str[4] = '4';
-		input_str[5] = '5';
-		input_str[6] = 254;
-		input_str[7] = '7';
-		
-		unsigned char crc_value = Crc8(input_str, 6);
-		input_str[8] = crc_value;
-		*/
-		
+		// Add CRC8
 		input[index_crc8] = Crc8(input, index_crc8);
 		
+		// Send answer
 		USART_Transmit_Str(input);
-		USART_Transmit_Str("\r");
-
+		USART_Transmit_Str("\r\n");
+		
+		// Clean variable
 		Clean_Data(input);
 	}
 	

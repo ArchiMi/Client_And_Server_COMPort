@@ -4,5 +4,5 @@
 
 main.c
 
-Src\CRC8.c
+Src\Crc8.c
 

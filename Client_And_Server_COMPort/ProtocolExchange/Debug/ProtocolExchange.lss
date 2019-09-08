@@ -3,29 +3,29 @@ ProtocolExchange.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .data         00000102  00800100  000002fe  00000372  2**0
+  0 .data         00000104  00800100  00000302  00000376  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  1 .text         000002fe  00000000  00000000  00000074  2**1
+  1 .text         00000302  00000000  00000000  00000074  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .comment      00000030  00000000  00000000  00000474  2**0
+  2 .comment      00000030  00000000  00000000  0000047a  2**0
                   CONTENTS, READONLY
-  3 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  000004a4  2**2
+  3 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  000004ac  2**2
                   CONTENTS, READONLY
-  4 .debug_aranges 00000090  00000000  00000000  000004e4  2**0
+  4 .debug_aranges 00000090  00000000  00000000  000004ec  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_info   00000d00  00000000  00000000  00000574  2**0
+  5 .debug_info   00000ce4  00000000  00000000  0000057c  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_abbrev 000008ac  00000000  00000000  00001274  2**0
+  6 .debug_abbrev 00000894  00000000  00000000  00001260  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_line   00000601  00000000  00000000  00001b20  2**0
+  7 .debug_line   0000061a  00000000  00000000  00001af4  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_frame  00000174  00000000  00000000  00002124  2**2
+  8 .debug_frame  00000174  00000000  00000000  00002110  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    000004c1  00000000  00000000  00002298  2**0
+  9 .debug_str    000004cc  00000000  00000000  00002284  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_loc    00000629  00000000  00000000  00002759  2**0
+ 10 .debug_loc    00000689  00000000  00000000  00002750  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_ranges 00000070  00000000  00000000  00002d82  2**0
+ 11 .debug_ranges 00000070  00000000  00000000  00002dd9  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -70,24 +70,24 @@ Disassembly of section .text:
   74:	12 e0       	ldi	r17, 0x02	; 2
   76:	a0 e0       	ldi	r26, 0x00	; 0
   78:	b1 e0       	ldi	r27, 0x01	; 1
-  7a:	ee ef       	ldi	r30, 0xFE	; 254
-  7c:	f2 e0       	ldi	r31, 0x02	; 2
+  7a:	e2 e0       	ldi	r30, 0x02	; 2
+  7c:	f3 e0       	ldi	r31, 0x03	; 3
   7e:	02 c0       	rjmp	.+4      	; 0x84 <__do_copy_data+0x10>
   80:	05 90       	lpm	r0, Z+
   82:	0d 92       	st	X+, r0
-  84:	a2 30       	cpi	r26, 0x02	; 2
+  84:	a4 30       	cpi	r26, 0x04	; 4
   86:	b1 07       	cpc	r27, r17
   88:	d9 f7       	brne	.-10     	; 0x80 <__do_copy_data+0xc>
   8a:	0e 94 18 01 	call	0x230	; 0x230 <main>
-  8e:	0c 94 7d 01 	jmp	0x2fa	; 0x2fa <_exit>
+  8e:	0c 94 7f 01 	jmp	0x2fe	; 0x2fe <_exit>
 
 00000092 <__bad_interrupt>:
   92:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
 
 00000096 <USART_Init>:
-
-#define FRAME_SIZE 32
-#define END_LINE 13
+#define CHR_CARRET_RETURN 13
+#define CHR_LINE_FEED 10
+#define CHR_COLON 58
 
 void USART_Init() {
 	sei();
@@ -144,8 +144,8 @@ void USART_Init() {
   d0:	90 e4       	ldi	r25, 0x40	; 64
   d2:	90 93 60 00 	sts	0x0060, r25	; 0x800060 <__TEXT_REGION_LENGTH__+0x7e0060>
 	
-	//UCSR0A |= (1<<U2X0); //???????? ???????
-	UCSR0B = (1<<RXEN0) | (1<<TXEN0); //????????? ????? ? ???????? ?? USART - T/R ENable = True
+	//UCSR0A |= (1<<U2X0); //Удвоение частоты
+	UCSR0B = (1<<RXEN0) | (1<<TXEN0); //Разрешаем прием и передачу по USART - T/R ENable = True
   d6:	80 93 c1 00 	sts	0x00C1, r24	; 0x8000c1 <__TEXT_REGION_LENGTH__+0x7e00c1>
 	UCSR0C = (0<<UMSEL01) | (0<<UMSEL00) | (1<<USBS0) | (1<<UCSZ00) | (1<<UCSZ01) | (1 << UCSZ00);
   da:	8e e0       	ldi	r24, 0x0E	; 14
@@ -209,11 +209,10 @@ void USART_Receive_Str(byte *calledstring) {
 	while(1) {		
 		ch = USART_Receive();
  122:	0e 94 7f 00 	call	0xfe	; 0xfe <USART_Receive>
-		
-		if (ch == END_LINE) {
- 126:	8d 30       	cpi	r24, 0x0D	; 13
+		if (ch == CHR_LINE_FEED) {
+ 126:	8a 30       	cpi	r24, 0x0A	; 10
  128:	21 f4       	brne	.+8      	; 0x132 <USART_Receive_Str+0x24>
-			calledstring[i] = END_LINE;	
+			calledstring[i] = CHR_LINE_FEED;	
  12a:	ce 0d       	add	r28, r14
  12c:	df 1d       	adc	r29, r15
  12e:	88 83       	st	Y, r24
@@ -224,7 +223,10 @@ void USART_Receive_Str(byte *calledstring) {
  132:	f8 01       	movw	r30, r16
  134:	81 93       	st	Z+, r24
  136:	8f 01       	movw	r16, r30
+		} else {
+			calledstring[i] = ch;
 		}
+		*/
 		
 		i++;
  138:	21 96       	adiw	r28, 0x01	; 1
@@ -451,166 +453,169 @@ int main(void) {
  25a:	ce 01       	movw	r24, r28
  25c:	01 96       	adiw	r24, 0x01	; 1
  25e:	0e 94 87 00 	call	0x10e	; 0x10e <USART_Receive_Str>
-		byte index_crc8 = GetCRC8Index(input, FRAME_SIZE, END_LINE);
- 262:	4d e0       	ldi	r20, 0x0D	; 13
- 264:	50 e0       	ldi	r21, 0x00	; 0
- 266:	60 e2       	ldi	r22, 0x20	; 32
- 268:	70 e0       	ldi	r23, 0x00	; 0
- 26a:	ce 01       	movw	r24, r28
- 26c:	01 96       	adiw	r24, 0x01	; 1
- 26e:	0e 94 6a 01 	call	0x2d4	; 0x2d4 <GetCRC8Index>
- 272:	8c 01       	movw	r16, r24
 		
-		//input[1] = index_crc8;
+		byte index_crc8 = GetCRC8Index(input, FRAME_SIZE, CHR_COLON);
+ 262:	4a e3       	ldi	r20, 0x3A	; 58
+ 264:	60 e2       	ldi	r22, 0x20	; 32
+ 266:	ce 01       	movw	r24, r28
+ 268:	01 96       	adiw	r24, 0x01	; 1
+ 26a:	0e 94 67 01 	call	0x2ce	; 0x2ce <GetCRC8Index>
+ 26e:	18 2f       	mov	r17, r24
 		
 		blink();
- 274:	0e 94 db 00 	call	0x1b6	; 0x1b6 <blink>
- 278:	11 27       	eor	r17, r17
-		
-		unsigned char crc_value = Crc8(input_str, 6);
-		input_str[8] = crc_value;
-		*/
+ 270:	0e 94 db 00 	call	0x1b6	; 0x1b6 <blink>
 		
 		input[index_crc8] = Crc8(input, index_crc8);
- 27a:	b8 01       	movw	r22, r16
- 27c:	ce 01       	movw	r24, r28
- 27e:	01 96       	adiw	r24, 0x01	; 1
- 280:	0e 94 56 01 	call	0x2ac	; 0x2ac <Crc8>
- 284:	e1 e0       	ldi	r30, 0x01	; 1
- 286:	f0 e0       	ldi	r31, 0x00	; 0
- 288:	ec 0f       	add	r30, r28
- 28a:	fd 1f       	adc	r31, r29
- 28c:	e0 0f       	add	r30, r16
- 28e:	f1 1f       	adc	r31, r17
- 290:	80 83       	st	Z, r24
+ 274:	61 2f       	mov	r22, r17
+ 276:	ce 01       	movw	r24, r28
+ 278:	01 96       	adiw	r24, 0x01	; 1
+ 27a:	0e 94 53 01 	call	0x2a6	; 0x2a6 <Crc8>
+ 27e:	e1 e0       	ldi	r30, 0x01	; 1
+ 280:	f0 e0       	ldi	r31, 0x00	; 0
+ 282:	ec 0f       	add	r30, r28
+ 284:	fd 1f       	adc	r31, r29
+ 286:	e1 0f       	add	r30, r17
+ 288:	f1 1d       	adc	r31, r1
+ 28a:	80 83       	st	Z, r24
 		
 		USART_Transmit_Str(input);
- 292:	ce 01       	movw	r24, r28
- 294:	01 96       	adiw	r24, 0x01	; 1
- 296:	0e 94 ad 00 	call	0x15a	; 0x15a <USART_Transmit_Str>
-		USART_Transmit_Str("\r");
- 29a:	80 e0       	ldi	r24, 0x00	; 0
- 29c:	91 e0       	ldi	r25, 0x01	; 1
- 29e:	0e 94 ad 00 	call	0x15a	; 0x15a <USART_Transmit_Str>
-
+ 28c:	ce 01       	movw	r24, r28
+ 28e:	01 96       	adiw	r24, 0x01	; 1
+ 290:	0e 94 ad 00 	call	0x15a	; 0x15a <USART_Transmit_Str>
+		USART_Transmit_Str("\r\n");
+ 294:	80 e0       	ldi	r24, 0x00	; 0
+ 296:	91 e0       	ldi	r25, 0x01	; 1
+ 298:	0e 94 ad 00 	call	0x15a	; 0x15a <USART_Transmit_Str>
+		
 		Clean_Data(input);
- 2a2:	ce 01       	movw	r24, r28
- 2a4:	01 96       	adiw	r24, 0x01	; 1
- 2a6:	0e 94 ea 00 	call	0x1d4	; 0x1d4 <Clean_Data>
- 2aa:	d7 cf       	rjmp	.-82     	; 0x25a <main+0x2a>
+ 29c:	ce 01       	movw	r24, r28
+ 29e:	01 96       	adiw	r24, 0x01	; 1
+ 2a0:	0e 94 ea 00 	call	0x1d4	; 0x1d4 <Clean_Data>
+ 2a4:	da cf       	rjmp	.-76     	; 0x25a <main+0x2a>
 
-000002ac <Crc8>:
+000002a6 <Crc8>:
 	0x3B, 0x0A, 0x59, 0x68, 0xFF, 0xCE, 0x9D, 0xAC
 };
 
 uint8_t Crc8(uint8_t *pcBlock, uint8_t len) {
 	uint8_t crc = 0xFF;
 	for (int i = 0; i < len; i++) {
- 2ac:	66 23       	and	r22, r22
- 2ae:	81 f0       	breq	.+32     	; 0x2d0 <Crc8+0x24>
- 2b0:	dc 01       	movw	r26, r24
- 2b2:	9c 01       	movw	r18, r24
- 2b4:	26 0f       	add	r18, r22
- 2b6:	31 1d       	adc	r19, r1
- 2b8:	8f ef       	ldi	r24, 0xFF	; 255
+ 2a6:	66 23       	and	r22, r22
+ 2a8:	81 f0       	breq	.+32     	; 0x2ca <Crc8+0x24>
+ 2aa:	dc 01       	movw	r26, r24
+ 2ac:	9c 01       	movw	r18, r24
+ 2ae:	26 0f       	add	r18, r22
+ 2b0:	31 1d       	adc	r19, r1
+ 2b2:	8f ef       	ldi	r24, 0xFF	; 255
 		//crc = pgm_read_byte(&Crc8Table[crc ^ *pcBlock++]);
 		crc = Crc8Table[crc ^ *pcBlock++];
- 2ba:	ed 91       	ld	r30, X+
- 2bc:	8e 27       	eor	r24, r30
- 2be:	e8 2f       	mov	r30, r24
- 2c0:	f0 e0       	ldi	r31, 0x00	; 0
- 2c2:	ee 5f       	subi	r30, 0xFE	; 254
- 2c4:	fe 4f       	sbci	r31, 0xFE	; 254
- 2c6:	80 81       	ld	r24, Z
+ 2b4:	ed 91       	ld	r30, X+
+ 2b6:	8e 27       	eor	r24, r30
+ 2b8:	e8 2f       	mov	r30, r24
+ 2ba:	f0 e0       	ldi	r31, 0x00	; 0
+ 2bc:	ed 5f       	subi	r30, 0xFD	; 253
+ 2be:	fe 4f       	sbci	r31, 0xFE	; 254
+ 2c0:	80 81       	ld	r24, Z
 	0x3B, 0x0A, 0x59, 0x68, 0xFF, 0xCE, 0x9D, 0xAC
 };
 
 uint8_t Crc8(uint8_t *pcBlock, uint8_t len) {
 	uint8_t crc = 0xFF;
 	for (int i = 0; i < len; i++) {
- 2c8:	a2 17       	cp	r26, r18
- 2ca:	b3 07       	cpc	r27, r19
- 2cc:	b1 f7       	brne	.-20     	; 0x2ba <Crc8+0xe>
- 2ce:	08 95       	ret
+ 2c2:	a2 17       	cp	r26, r18
+ 2c4:	b3 07       	cpc	r27, r19
+ 2c6:	b1 f7       	brne	.-20     	; 0x2b4 <Crc8+0xe>
+ 2c8:	08 95       	ret
 	0x82, 0xB3, 0xE0, 0xD1, 0x46, 0x77, 0x24, 0x15,
 	0x3B, 0x0A, 0x59, 0x68, 0xFF, 0xCE, 0x9D, 0xAC
 };
 
 uint8_t Crc8(uint8_t *pcBlock, uint8_t len) {
 	uint8_t crc = 0xFF;
- 2d0:	8f ef       	ldi	r24, 0xFF	; 255
+ 2ca:	8f ef       	ldi	r24, 0xFF	; 255
 		//crc = pgm_read_byte(&Crc8Table[crc ^ *pcBlock++]);
 		crc = Crc8Table[crc ^ *pcBlock++];
 	}
 
 	return crc;
 }
- 2d2:	08 95       	ret
+ 2cc:	08 95       	ret
 
-000002d4 <GetCRC8Index>:
+000002ce <GetCRC8Index>:
 
-byte GetCRC8Index(byte *input_data) {
+// frame_size = 32
+// end_line = 13
+byte GetCRC8Index(byte *input_data, uint8_t frame_size, uint8_t end_line) {
+ 2ce:	fc 01       	movw	r30, r24
 	uint8_t x = 0;
-	for (uint8_t i = 0; i < FRAME_SIZE; i++) {
-		if (input_data[i] == END_LINE) {
- 2d4:	fc 01       	movw	r30, r24
- 2d6:	20 81       	ld	r18, Z
- 2d8:	2d 30       	cpi	r18, 0x0D	; 13
- 2da:	31 f0       	breq	.+12     	; 0x2e8 <GetCRC8Index+0x14>
- 2dc:	31 96       	adiw	r30, 0x01	; 1
+	for (uint8_t i = 0; i < frame_size; i++) {
+ 2d0:	66 23       	and	r22, r22
+ 2d2:	99 f0       	breq	.+38     	; 0x2fa <GetCRC8Index+0x2c>
+		if (input_data[i] == end_line) {
+ 2d4:	80 81       	ld	r24, Z
+ 2d6:	48 13       	cpse	r20, r24
+ 2d8:	09 c0       	rjmp	.+18     	; 0x2ec <GetCRC8Index+0x1e>
+ 2da:	04 c0       	rjmp	.+8      	; 0x2e4 <GetCRC8Index+0x16>
+ 2dc:	21 91       	ld	r18, Z+
+ 2de:	24 13       	cpse	r18, r20
+ 2e0:	07 c0       	rjmp	.+14     	; 0x2f0 <GetCRC8Index+0x22>
+ 2e2:	01 c0       	rjmp	.+2      	; 0x2e6 <GetCRC8Index+0x18>
+
+// frame_size = 32
+// end_line = 13
+byte GetCRC8Index(byte *input_data, uint8_t frame_size, uint8_t end_line) {
+	uint8_t x = 0;
+	for (uint8_t i = 0; i < frame_size; i++) {
+ 2e4:	90 e0       	ldi	r25, 0x00	; 0
+		if (input_data[i] == end_line) {
 			return i - 1;
-		}
-		
-		x++;
- 2de:	91 e0       	ldi	r25, 0x01	; 1
-}
-
-byte GetCRC8Index(byte *input_data) {
+ 2e6:	8f ef       	ldi	r24, 0xFF	; 255
+ 2e8:	89 0f       	add	r24, r25
+ 2ea:	08 95       	ret
+ 2ec:	31 96       	adiw	r30, 0x01	; 1
+// frame_size = 32
+// end_line = 13
+byte GetCRC8Index(byte *input_data, uint8_t frame_size, uint8_t end_line) {
 	uint8_t x = 0;
-	for (uint8_t i = 0; i < FRAME_SIZE; i++) {
-		if (input_data[i] == END_LINE) {
- 2e0:	81 91       	ld	r24, Z+
- 2e2:	8d 30       	cpi	r24, 0x0D	; 13
- 2e4:	29 f4       	brne	.+10     	; 0x2f0 <GetCRC8Index+0x1c>
- 2e6:	01 c0       	rjmp	.+2      	; 0x2ea <GetCRC8Index+0x16>
-	return crc;
-}
-
-byte GetCRC8Index(byte *input_data) {
-	uint8_t x = 0;
-	for (uint8_t i = 0; i < FRAME_SIZE; i++) {
- 2e8:	90 e0       	ldi	r25, 0x00	; 0
-		if (input_data[i] == END_LINE) {
+	for (uint8_t i = 0; i < frame_size; i++) {
+		if (input_data[i] == end_line) {
+ 2ee:	90 e0       	ldi	r25, 0x00	; 0
 			return i - 1;
- 2ea:	8f ef       	ldi	r24, 0xFF	; 255
- 2ec:	89 0f       	add	r24, r25
- 2ee:	08 95       	ret
 		}
 		
 		x++;
  2f0:	9f 5f       	subi	r25, 0xFF	; 255
-	return crc;
-}
 
-byte GetCRC8Index(byte *input_data) {
+// frame_size = 32
+// end_line = 13
+byte GetCRC8Index(byte *input_data, uint8_t frame_size, uint8_t end_line) {
 	uint8_t x = 0;
-	for (uint8_t i = 0; i < FRAME_SIZE; i++) {
- 2f2:	90 32       	cpi	r25, 0x20	; 32
- 2f4:	a9 f7       	brne	.-22     	; 0x2e0 <GetCRC8Index+0xc>
-		if (input_data[i] == END_LINE) {
+	for (uint8_t i = 0; i < frame_size; i++) {
+ 2f2:	69 13       	cpse	r22, r25
+ 2f4:	f3 cf       	rjmp	.-26     	; 0x2dc <GetCRC8Index+0xe>
+		if (input_data[i] == end_line) {
 			return i - 1;
 		}
 		
 		x++;
- 2f6:	80 e2       	ldi	r24, 0x20	; 32
+ 2f6:	86 2f       	mov	r24, r22
+ 2f8:	08 95       	ret
+}
+
+// frame_size = 32
+// end_line = 13
+byte GetCRC8Index(byte *input_data, uint8_t frame_size, uint8_t end_line) {
+	uint8_t x = 0;
+ 2fa:	80 e0       	ldi	r24, 0x00	; 0
+		
+		x++;
 	}
 	
 	return x;
-}
- 2f8:	08 95       	ret
+ 2fc:	08 95       	ret
 
-000002fa <_exit>:
- 2fa:	f8 94       	cli
+000002fe <_exit>:
+ 2fe:	f8 94       	cli
 
-000002fc <__stop_program>:
- 2fc:	ff cf       	rjmp	.-2      	; 0x2fc <__stop_program>
+00000300 <__stop_program>:
+ 300:	ff cf       	rjmp	.-2      	; 0x300 <__stop_program>

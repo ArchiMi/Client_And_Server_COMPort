@@ -120,11 +120,15 @@ namespace ClientAppNameSpace.Src
 
                         } while (x != '\r' || i == result.Length - 1);
                     }
-                    catch (IndexOutOfRangeException ex)
+                    catch (ObjectDisposedException)
+                    {
+
+                    }
+                    catch (IndexOutOfRangeException)
                     {
                         //MessageBox.Show($"{ex.Message} (index={i})");
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         //MessageBox.Show($"{ex.Message} (index={i})");
                     }

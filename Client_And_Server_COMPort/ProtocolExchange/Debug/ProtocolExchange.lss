@@ -3,29 +3,29 @@ ProtocolExchange.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .data         00000104  00800100  00000302  00000376  2**0
+  0 .data         00000104  00800100  00000320  00000394  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  1 .text         00000302  00000000  00000000  00000074  2**1
+  1 .text         00000320  00000000  00000000  00000074  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .comment      00000030  00000000  00000000  0000047a  2**0
+  2 .comment      00000030  00000000  00000000  00000498  2**0
                   CONTENTS, READONLY
-  3 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  000004ac  2**2
+  3 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  000004c8  2**2
                   CONTENTS, READONLY
-  4 .debug_aranges 00000090  00000000  00000000  000004ec  2**0
+  4 .debug_aranges 00000090  00000000  00000000  00000508  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_info   00000ce4  00000000  00000000  0000057c  2**0
+  5 .debug_info   00000ce6  00000000  00000000  00000598  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_abbrev 00000894  00000000  00000000  00001260  2**0
+  6 .debug_abbrev 00000885  00000000  00000000  0000127e  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_line   0000061a  00000000  00000000  00001af4  2**0
+  7 .debug_line   0000063e  00000000  00000000  00001b03  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_frame  00000174  00000000  00000000  00002110  2**2
+  8 .debug_frame  00000170  00000000  00000000  00002144  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    000004cc  00000000  00000000  00002284  2**0
+  9 .debug_str    00000519  00000000  00000000  000022b4  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_loc    00000689  00000000  00000000  00002750  2**0
+ 10 .debug_loc    0000068a  00000000  00000000  000027cd  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_ranges 00000070  00000000  00000000  00002dd9  2**0
+ 11 .debug_ranges 00000070  00000000  00000000  00002e57  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -37,7 +37,7 @@ Disassembly of section .text:
    c:	0c 94 49 00 	jmp	0x92	; 0x92 <__bad_interrupt>
   10:	0c 94 49 00 	jmp	0x92	; 0x92 <__bad_interrupt>
   14:	0c 94 49 00 	jmp	0x92	; 0x92 <__bad_interrupt>
-  18:	0c 94 f1 00 	jmp	0x1e2	; 0x1e2 <__vector_6>
+  18:	0c 94 00 01 	jmp	0x200	; 0x200 <__vector_6>
   1c:	0c 94 49 00 	jmp	0x92	; 0x92 <__bad_interrupt>
   20:	0c 94 49 00 	jmp	0x92	; 0x92 <__bad_interrupt>
   24:	0c 94 49 00 	jmp	0x92	; 0x92 <__bad_interrupt>
@@ -70,7 +70,7 @@ Disassembly of section .text:
   74:	12 e0       	ldi	r17, 0x02	; 2
   76:	a0 e0       	ldi	r26, 0x00	; 0
   78:	b1 e0       	ldi	r27, 0x01	; 1
-  7a:	e2 e0       	ldi	r30, 0x02	; 2
+  7a:	e0 e2       	ldi	r30, 0x20	; 32
   7c:	f3 e0       	ldi	r31, 0x03	; 3
   7e:	02 c0       	rjmp	.+4      	; 0x84 <__do_copy_data+0x10>
   80:	05 90       	lpm	r0, Z+
@@ -78,8 +78,8 @@ Disassembly of section .text:
   84:	a4 30       	cpi	r26, 0x04	; 4
   86:	b1 07       	cpc	r27, r17
   88:	d9 f7       	brne	.-10     	; 0x80 <__do_copy_data+0xc>
-  8a:	0e 94 18 01 	call	0x230	; 0x230 <main>
-  8e:	0c 94 7f 01 	jmp	0x2fe	; 0x2fe <_exit>
+  8a:	0e 94 27 01 	call	0x24e	; 0x24e <main>
+  8e:	0c 94 8e 01 	jmp	0x31c	; 0x31c <_exit>
 
 00000092 <__bad_interrupt>:
   92:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
@@ -193,429 +193,411 @@ byte USART_Receive(void) {
 0000010e <USART_Receive_Str>:
 
 void USART_Receive_Str(byte *calledstring) {
- 10e:	ef 92       	push	r14
- 110:	ff 92       	push	r15
- 112:	0f 93       	push	r16
- 114:	1f 93       	push	r17
- 116:	cf 93       	push	r28
- 118:	df 93       	push	r29
- 11a:	7c 01       	movw	r14, r24
- 11c:	8c 01       	movw	r16, r24
+ 10e:	ff 92       	push	r15
+ 110:	0f 93       	push	r16
+ 112:	1f 93       	push	r17
+ 114:	cf 93       	push	r28
+ 116:	df 93       	push	r29
+ 118:	8c 01       	movw	r16, r24
 	char ch;
 	
 	int i = 0;	
- 11e:	c0 e0       	ldi	r28, 0x00	; 0
- 120:	d0 e0       	ldi	r29, 0x00	; 0
+ 11a:	c0 e0       	ldi	r28, 0x00	; 0
+ 11c:	d0 e0       	ldi	r29, 0x00	; 0
+		if (ch == CHR_LINE_FEED && i > 1) {
+			if (calledstring[--i] == CHR_CARRET_RETURN) {
+				calledstring[i] = CHR_LINE_FEED;	
+				return;
+			} else {
+				calledstring[i] = ch;
+ 11e:	0f 2e       	mov	r0, r31
+ 120:	fa e0       	ldi	r31, 0x0A	; 10
+ 122:	ff 2e       	mov	r15, r31
+ 124:	f0 2d       	mov	r31, r0
 	while(1) {		
-		ch = USART_Receive();
- 122:	0e 94 7f 00 	call	0xfe	; 0xfe <USART_Receive>
-		if (ch == CHR_LINE_FEED) {
- 126:	8a 30       	cpi	r24, 0x0A	; 10
- 128:	21 f4       	brne	.+8      	; 0x132 <USART_Receive_Str+0x24>
-			calledstring[i] = CHR_LINE_FEED;	
- 12a:	ce 0d       	add	r28, r14
- 12c:	df 1d       	adc	r29, r15
- 12e:	88 83       	st	Y, r24
+		if (i == FRAME_SIZE) {
 			return;
- 130:	05 c0       	rjmp	.+10     	; 0x13c <USART_Receive_Str+0x2e>
+		}		
+		
+		ch = USART_Receive();
+ 126:	0e 94 7f 00 	call	0xfe	; 0xfe <USART_Receive>
+		if (ch == CHR_LINE_FEED && i > 1) {
+ 12a:	8a 30       	cpi	r24, 0x0A	; 10
+ 12c:	79 f4       	brne	.+30     	; 0x14c <USART_Receive_Str+0x3e>
+ 12e:	c2 30       	cpi	r28, 0x02	; 2
+ 130:	d1 05       	cpc	r29, r1
+ 132:	64 f0       	brlt	.+24     	; 0x14c <USART_Receive_Str+0x3e>
+			if (calledstring[--i] == CHR_CARRET_RETURN) {
+ 134:	21 97       	sbiw	r28, 0x01	; 1
+ 136:	f8 01       	movw	r30, r16
+ 138:	ec 0f       	add	r30, r28
+ 13a:	fd 1f       	adc	r31, r29
+ 13c:	80 81       	ld	r24, Z
+ 13e:	8d 30       	cpi	r24, 0x0D	; 13
+ 140:	19 f4       	brne	.+6      	; 0x148 <USART_Receive_Str+0x3a>
+				calledstring[i] = CHR_LINE_FEED;	
+ 142:	8a e0       	ldi	r24, 0x0A	; 10
+ 144:	80 83       	st	Z, r24
+				return;
+ 146:	0a c0       	rjmp	.+20     	; 0x15c <USART_Receive_Str+0x4e>
+			} else {
+				calledstring[i] = ch;
+ 148:	f0 82       	st	Z, r15
+			return;
+		}		
+		
+		ch = USART_Receive();
+		if (ch == CHR_LINE_FEED && i > 1) {
+			if (calledstring[--i] == CHR_CARRET_RETURN) {
+ 14a:	04 c0       	rjmp	.+8      	; 0x154 <USART_Receive_Str+0x46>
+				return;
+			} else {
+				calledstring[i] = ch;
+			}
 		} else {
-			calledstring[i] = ch;			
- 132:	f8 01       	movw	r30, r16
- 134:	81 93       	st	Z+, r24
- 136:	8f 01       	movw	r16, r30
+			calledstring[i] = ch;		
+ 14c:	f8 01       	movw	r30, r16
+ 14e:	ec 0f       	add	r30, r28
+ 150:	fd 1f       	adc	r31, r29
+ 152:	80 83       	st	Z, r24
 		} else {
 			calledstring[i] = ch;
 		}
 		*/
 		
 		i++;
- 138:	21 96       	adiw	r28, 0x01	; 1
+ 154:	21 96       	adiw	r28, 0x01	; 1
+void USART_Receive_Str(byte *calledstring) {
+	char ch;
+	
+	int i = 0;	
+	while(1) {		
+		if (i == FRAME_SIZE) {
+ 156:	c0 32       	cpi	r28, 0x20	; 32
+ 158:	d1 05       	cpc	r29, r1
+ 15a:	29 f7       	brne	.-54     	; 0x126 <USART_Receive_Str+0x18>
+		}
+		*/
+		
+		i++;
 	}	
- 13a:	f3 cf       	rjmp	.-26     	; 0x122 <USART_Receive_Str+0x14>
 }
- 13c:	df 91       	pop	r29
- 13e:	cf 91       	pop	r28
- 140:	1f 91       	pop	r17
- 142:	0f 91       	pop	r16
- 144:	ff 90       	pop	r15
- 146:	ef 90       	pop	r14
- 148:	08 95       	ret
+ 15c:	df 91       	pop	r29
+ 15e:	cf 91       	pop	r28
+ 160:	1f 91       	pop	r17
+ 162:	0f 91       	pop	r16
+ 164:	ff 90       	pop	r15
+ 166:	08 95       	ret
 
-0000014a <USART_Send>:
+00000168 <USART_Send>:
 
 void USART_Send(byte data) {
 	while( !(UCSR0A & (1<<UDRE0)) );
- 14a:	e0 ec       	ldi	r30, 0xC0	; 192
- 14c:	f0 e0       	ldi	r31, 0x00	; 0
- 14e:	90 81       	ld	r25, Z
- 150:	95 ff       	sbrs	r25, 5
- 152:	fd cf       	rjmp	.-6      	; 0x14e <USART_Send+0x4>
+ 168:	e0 ec       	ldi	r30, 0xC0	; 192
+ 16a:	f0 e0       	ldi	r31, 0x00	; 0
+ 16c:	90 81       	ld	r25, Z
+ 16e:	95 ff       	sbrs	r25, 5
+ 170:	fd cf       	rjmp	.-6      	; 0x16c <USART_Send+0x4>
 	UDR0 = data;
- 154:	80 93 c6 00 	sts	0x00C6, r24	; 0x8000c6 <__TEXT_REGION_LENGTH__+0x7e00c6>
- 158:	08 95       	ret
+ 172:	80 93 c6 00 	sts	0x00C6, r24	; 0x8000c6 <__TEXT_REGION_LENGTH__+0x7e00c6>
+ 176:	08 95       	ret
 
-0000015a <USART_Transmit_Str>:
+00000178 <USART_Transmit_Str>:
 }
 
 void USART_Transmit_Str(byte *calledstring) {
- 15a:	0f 93       	push	r16
- 15c:	1f 93       	push	r17
- 15e:	cf 93       	push	r28
- 160:	df 93       	push	r29
- 162:	fc 01       	movw	r30, r24
+ 178:	0f 93       	push	r16
+ 17a:	1f 93       	push	r17
+ 17c:	cf 93       	push	r28
+ 17e:	df 93       	push	r29
+ 180:	fc 01       	movw	r30, r24
 	for (int i = 0; i < FRAME_SIZE; i++) {
 		if (calledstring[i] != 0)
- 164:	80 81       	ld	r24, Z
- 166:	81 11       	cpse	r24, r1
- 168:	0a c0       	rjmp	.+20     	; 0x17e <USART_Transmit_Str+0x24>
- 16a:	11 c0       	rjmp	.+34     	; 0x18e <USART_Transmit_Str+0x34>
- 16c:	89 91       	ld	r24, Y+
- 16e:	88 23       	and	r24, r24
- 170:	71 f0       	breq	.+28     	; 0x18e <USART_Transmit_Str+0x34>
+ 182:	80 81       	ld	r24, Z
+ 184:	81 11       	cpse	r24, r1
+ 186:	0a c0       	rjmp	.+20     	; 0x19c <USART_Transmit_Str+0x24>
+ 188:	11 c0       	rjmp	.+34     	; 0x1ac <USART_Transmit_Str+0x34>
+ 18a:	89 91       	ld	r24, Y+
+ 18c:	88 23       	and	r24, r24
+ 18e:	71 f0       	breq	.+28     	; 0x1ac <USART_Transmit_Str+0x34>
 			USART_Send(calledstring[i]);
- 172:	0e 94 a5 00 	call	0x14a	; 0x14a <USART_Send>
+ 190:	0e 94 b4 00 	call	0x168	; 0x168 <USART_Send>
 	while( !(UCSR0A & (1<<UDRE0)) );
 	UDR0 = data;
 }
 
 void USART_Transmit_Str(byte *calledstring) {
 	for (int i = 0; i < FRAME_SIZE; i++) {
- 176:	0c 17       	cp	r16, r28
- 178:	1d 07       	cpc	r17, r29
- 17a:	c1 f7       	brne	.-16     	; 0x16c <USART_Transmit_Str+0x12>
- 17c:	08 c0       	rjmp	.+16     	; 0x18e <USART_Transmit_Str+0x34>
- 17e:	8f 01       	movw	r16, r30
+ 194:	0c 17       	cp	r16, r28
+ 196:	1d 07       	cpc	r17, r29
+ 198:	c1 f7       	brne	.-16     	; 0x18a <USART_Transmit_Str+0x12>
+ 19a:	08 c0       	rjmp	.+16     	; 0x1ac <USART_Transmit_Str+0x34>
+ 19c:	8f 01       	movw	r16, r30
 		if (calledstring[i] != 0)
 			USART_Send(calledstring[i]);
- 180:	0e 94 a5 00 	call	0x14a	; 0x14a <USART_Send>
- 184:	e8 01       	movw	r28, r16
- 186:	21 96       	adiw	r28, 0x01	; 1
- 188:	00 5e       	subi	r16, 0xE0	; 224
- 18a:	1f 4f       	sbci	r17, 0xFF	; 255
- 18c:	ef cf       	rjmp	.-34     	; 0x16c <USART_Transmit_Str+0x12>
+ 19e:	0e 94 b4 00 	call	0x168	; 0x168 <USART_Send>
+ 1a2:	e8 01       	movw	r28, r16
+ 1a4:	21 96       	adiw	r28, 0x01	; 1
+ 1a6:	00 5e       	subi	r16, 0xE0	; 224
+ 1a8:	1f 4f       	sbci	r17, 0xFF	; 255
+ 1aa:	ef cf       	rjmp	.-34     	; 0x18a <USART_Transmit_Str+0x12>
 		else 
 			break;		
 	}
 }
- 18e:	df 91       	pop	r29
- 190:	cf 91       	pop	r28
- 192:	1f 91       	pop	r17
- 194:	0f 91       	pop	r16
- 196:	08 95       	ret
+ 1ac:	df 91       	pop	r29
+ 1ae:	cf 91       	pop	r28
+ 1b0:	1f 91       	pop	r17
+ 1b2:	0f 91       	pop	r16
+ 1b4:	08 95       	ret
 
-00000198 <blink_WD>:
+000001b6 <blink_WD>:
 
 void blink_WD() {
 	PORTB |= ( 1 << PINB4 ); //0xFF; //On
- 198:	2c 9a       	sbi	0x05, 4	; 5
- 19a:	8f e9       	ldi	r24, 0x9F	; 159
- 19c:	9f e0       	ldi	r25, 0x0F	; 15
- 19e:	01 97       	sbiw	r24, 0x01	; 1
- 1a0:	f1 f7       	brne	.-4      	; 0x19e <blink_WD+0x6>
- 1a2:	00 c0       	rjmp	.+0      	; 0x1a4 <blink_WD+0xc>
- 1a4:	00 00       	nop
+ 1b6:	2c 9a       	sbi	0x05, 4	; 5
+ 1b8:	8f e9       	ldi	r24, 0x9F	; 159
+ 1ba:	9f e0       	ldi	r25, 0x0F	; 15
+ 1bc:	01 97       	sbiw	r24, 0x01	; 1
+ 1be:	f1 f7       	brne	.-4      	; 0x1bc <blink_WD+0x6>
+ 1c0:	00 c0       	rjmp	.+0      	; 0x1c2 <blink_WD+0xc>
+ 1c2:	00 00       	nop
 	_delay_ms(1);
 	PORTB &= ~( 1 << PINB4 ); //0x00; //OFF
- 1a6:	2c 98       	cbi	0x05, 4	; 5
- 1a8:	8f e9       	ldi	r24, 0x9F	; 159
- 1aa:	9f e0       	ldi	r25, 0x0F	; 15
- 1ac:	01 97       	sbiw	r24, 0x01	; 1
- 1ae:	f1 f7       	brne	.-4      	; 0x1ac <blink_WD+0x14>
- 1b0:	00 c0       	rjmp	.+0      	; 0x1b2 <blink_WD+0x1a>
- 1b2:	00 00       	nop
- 1b4:	08 95       	ret
+ 1c4:	2c 98       	cbi	0x05, 4	; 5
+ 1c6:	8f e9       	ldi	r24, 0x9F	; 159
+ 1c8:	9f e0       	ldi	r25, 0x0F	; 15
+ 1ca:	01 97       	sbiw	r24, 0x01	; 1
+ 1cc:	f1 f7       	brne	.-4      	; 0x1ca <blink_WD+0x14>
+ 1ce:	00 c0       	rjmp	.+0      	; 0x1d0 <blink_WD+0x1a>
+ 1d0:	00 00       	nop
+ 1d2:	08 95       	ret
 
-000001b6 <blink>:
+000001d4 <blink>:
 	_delay_ms(1);
 }
 
 void blink() {
 	PORTB |= ( 1 << PINB5 ); //0xFF; //On
- 1b6:	2d 9a       	sbi	0x05, 5	; 5
- 1b8:	8f e1       	ldi	r24, 0x1F	; 31
- 1ba:	9e e4       	ldi	r25, 0x4E	; 78
- 1bc:	01 97       	sbiw	r24, 0x01	; 1
- 1be:	f1 f7       	brne	.-4      	; 0x1bc <blink+0x6>
- 1c0:	00 c0       	rjmp	.+0      	; 0x1c2 <blink+0xc>
- 1c2:	00 00       	nop
+ 1d4:	2d 9a       	sbi	0x05, 5	; 5
+ 1d6:	8f e1       	ldi	r24, 0x1F	; 31
+ 1d8:	9e e4       	ldi	r25, 0x4E	; 78
+ 1da:	01 97       	sbiw	r24, 0x01	; 1
+ 1dc:	f1 f7       	brne	.-4      	; 0x1da <blink+0x6>
+ 1de:	00 c0       	rjmp	.+0      	; 0x1e0 <blink+0xc>
+ 1e0:	00 00       	nop
 	_delay_ms(5);
 	PORTB &= ~( 1 << PINB5 ); //0x00; //OFF
- 1c4:	2d 98       	cbi	0x05, 5	; 5
- 1c6:	8f e1       	ldi	r24, 0x1F	; 31
- 1c8:	9e e4       	ldi	r25, 0x4E	; 78
- 1ca:	01 97       	sbiw	r24, 0x01	; 1
- 1cc:	f1 f7       	brne	.-4      	; 0x1ca <blink+0x14>
- 1ce:	00 c0       	rjmp	.+0      	; 0x1d0 <blink+0x1a>
- 1d0:	00 00       	nop
- 1d2:	08 95       	ret
+ 1e2:	2d 98       	cbi	0x05, 5	; 5
+ 1e4:	8f e1       	ldi	r24, 0x1F	; 31
+ 1e6:	9e e4       	ldi	r25, 0x4E	; 78
+ 1e8:	01 97       	sbiw	r24, 0x01	; 1
+ 1ea:	f1 f7       	brne	.-4      	; 0x1e8 <blink+0x14>
+ 1ec:	00 c0       	rjmp	.+0      	; 0x1ee <blink+0x1a>
+ 1ee:	00 00       	nop
+ 1f0:	08 95       	ret
 
-000001d4 <Clean_Data>:
+000001f2 <Clean_Data>:
 	_delay_ms(5);
 }
 
 void Clean_Data(byte *input_data) {
- 1d4:	fc 01       	movw	r30, r24
- 1d6:	80 96       	adiw	r24, 0x20	; 32
+ 1f2:	fc 01       	movw	r30, r24
+ 1f4:	80 96       	adiw	r24, 0x20	; 32
 	for (uint8_t i = 0; i < FRAME_SIZE; i++) {
 		input_data[i] = 0;
- 1d8:	11 92       	st	Z+, r1
+ 1f6:	11 92       	st	Z+, r1
 	PORTB &= ~( 1 << PINB5 ); //0x00; //OFF
 	_delay_ms(5);
 }
 
 void Clean_Data(byte *input_data) {
 	for (uint8_t i = 0; i < FRAME_SIZE; i++) {
- 1da:	e8 17       	cp	r30, r24
- 1dc:	f9 07       	cpc	r31, r25
- 1de:	e1 f7       	brne	.-8      	; 0x1d8 <Clean_Data+0x4>
+ 1f8:	e8 17       	cp	r30, r24
+ 1fa:	f9 07       	cpc	r31, r25
+ 1fc:	e1 f7       	brne	.-8      	; 0x1f6 <Clean_Data+0x4>
 		input_data[i] = 0;
 	}
 }
- 1e0:	08 95       	ret
+ 1fe:	08 95       	ret
 
-000001e2 <__vector_6>:
+00000200 <__vector_6>:
 
+// Watch dog
 ISR(WDT_vect) {
- 1e2:	1f 92       	push	r1
- 1e4:	0f 92       	push	r0
- 1e6:	0f b6       	in	r0, 0x3f	; 63
- 1e8:	0f 92       	push	r0
- 1ea:	11 24       	eor	r1, r1
- 1ec:	2f 93       	push	r18
- 1ee:	3f 93       	push	r19
- 1f0:	4f 93       	push	r20
- 1f2:	5f 93       	push	r21
- 1f4:	6f 93       	push	r22
- 1f6:	7f 93       	push	r23
- 1f8:	8f 93       	push	r24
- 1fa:	9f 93       	push	r25
- 1fc:	af 93       	push	r26
- 1fe:	bf 93       	push	r27
- 200:	ef 93       	push	r30
- 202:	ff 93       	push	r31
+ 200:	1f 92       	push	r1
+ 202:	0f 92       	push	r0
+ 204:	0f b6       	in	r0, 0x3f	; 63
+ 206:	0f 92       	push	r0
+ 208:	11 24       	eor	r1, r1
+ 20a:	2f 93       	push	r18
+ 20c:	3f 93       	push	r19
+ 20e:	4f 93       	push	r20
+ 210:	5f 93       	push	r21
+ 212:	6f 93       	push	r22
+ 214:	7f 93       	push	r23
+ 216:	8f 93       	push	r24
+ 218:	9f 93       	push	r25
+ 21a:	af 93       	push	r26
+ 21c:	bf 93       	push	r27
+ 21e:	ef 93       	push	r30
+ 220:	ff 93       	push	r31
 	wdt_reset();
- 204:	a8 95       	wdr
+ 222:	a8 95       	wdr
 
 	USART_Init();
- 206:	0e 94 4b 00 	call	0x96	; 0x96 <USART_Init>
+ 224:	0e 94 4b 00 	call	0x96	; 0x96 <USART_Init>
 	
 	blink_WD();
- 20a:	0e 94 cc 00 	call	0x198	; 0x198 <blink_WD>
+ 228:	0e 94 db 00 	call	0x1b6	; 0x1b6 <blink_WD>
 }
- 20e:	ff 91       	pop	r31
- 210:	ef 91       	pop	r30
- 212:	bf 91       	pop	r27
- 214:	af 91       	pop	r26
- 216:	9f 91       	pop	r25
- 218:	8f 91       	pop	r24
- 21a:	7f 91       	pop	r23
- 21c:	6f 91       	pop	r22
- 21e:	5f 91       	pop	r21
- 220:	4f 91       	pop	r20
- 222:	3f 91       	pop	r19
- 224:	2f 91       	pop	r18
- 226:	0f 90       	pop	r0
- 228:	0f be       	out	0x3f, r0	; 63
- 22a:	0f 90       	pop	r0
- 22c:	1f 90       	pop	r1
- 22e:	18 95       	reti
+ 22c:	ff 91       	pop	r31
+ 22e:	ef 91       	pop	r30
+ 230:	bf 91       	pop	r27
+ 232:	af 91       	pop	r26
+ 234:	9f 91       	pop	r25
+ 236:	8f 91       	pop	r24
+ 238:	7f 91       	pop	r23
+ 23a:	6f 91       	pop	r22
+ 23c:	5f 91       	pop	r21
+ 23e:	4f 91       	pop	r20
+ 240:	3f 91       	pop	r19
+ 242:	2f 91       	pop	r18
+ 244:	0f 90       	pop	r0
+ 246:	0f be       	out	0x3f, r0	; 63
+ 248:	0f 90       	pop	r0
+ 24a:	1f 90       	pop	r1
+ 24c:	18 95       	reti
 
-00000230 <main>:
+0000024e <main>:
 
 int main(void) {
- 230:	cf 93       	push	r28
- 232:	df 93       	push	r29
- 234:	cd b7       	in	r28, 0x3d	; 61
- 236:	de b7       	in	r29, 0x3e	; 62
- 238:	a0 97       	sbiw	r28, 0x20	; 32
- 23a:	0f b6       	in	r0, 0x3f	; 63
- 23c:	f8 94       	cli
- 23e:	de bf       	out	0x3e, r29	; 62
- 240:	0f be       	out	0x3f, r0	; 63
- 242:	cd bf       	out	0x3d, r28	; 61
-	DDRB = 0xFF; //PORTC as Output
- 244:	8f ef       	ldi	r24, 0xFF	; 255
- 246:	84 b9       	out	0x04, r24	; 4
+ 24e:	cf 93       	push	r28
+ 250:	df 93       	push	r29
+ 252:	cd b7       	in	r28, 0x3d	; 61
+ 254:	de b7       	in	r29, 0x3e	; 62
+ 256:	a0 97       	sbiw	r28, 0x20	; 32
+ 258:	0f b6       	in	r0, 0x3f	; 63
+ 25a:	f8 94       	cli
+ 25c:	de bf       	out	0x3e, r29	; 62
+ 25e:	0f be       	out	0x3f, r0	; 63
+ 260:	cd bf       	out	0x3d, r28	; 61
+	DDRB = 0xFF; //PORTB as Output
+ 262:	8f ef       	ldi	r24, 0xFF	; 255
+ 264:	84 b9       	out	0x04, r24	; 4
 	
 	byte input[FRAME_SIZE] = { 0 };
- 248:	fe 01       	movw	r30, r28
- 24a:	31 96       	adiw	r30, 0x01	; 1
- 24c:	80 e2       	ldi	r24, 0x20	; 32
- 24e:	df 01       	movw	r26, r30
- 250:	1d 92       	st	X+, r1
- 252:	8a 95       	dec	r24
- 254:	e9 f7       	brne	.-6      	; 0x250 <main+0x20>
+ 266:	fe 01       	movw	r30, r28
+ 268:	31 96       	adiw	r30, 0x01	; 1
+ 26a:	80 e2       	ldi	r24, 0x20	; 32
+ 26c:	df 01       	movw	r26, r30
+ 26e:	1d 92       	st	X+, r1
+ 270:	8a 95       	dec	r24
+ 272:	e9 f7       	brne	.-6      	; 0x26e <main+0x20>
 	USART_Init();       
- 256:	0e 94 4b 00 	call	0x96	; 0x96 <USART_Init>
+ 274:	0e 94 4b 00 	call	0x96	; 0x96 <USART_Init>
 	
 	while(1) {
+		// Get request
 		USART_Receive_Str(input);
- 25a:	ce 01       	movw	r24, r28
- 25c:	01 96       	adiw	r24, 0x01	; 1
- 25e:	0e 94 87 00 	call	0x10e	; 0x10e <USART_Receive_Str>
+ 278:	ce 01       	movw	r24, r28
+ 27a:	01 96       	adiw	r24, 0x01	; 1
+ 27c:	0e 94 87 00 	call	0x10e	; 0x10e <USART_Receive_Str>
 		
+		// Get CRC8 byte index
 		byte index_crc8 = GetCRC8Index(input, FRAME_SIZE, CHR_COLON);
- 262:	4a e3       	ldi	r20, 0x3A	; 58
- 264:	60 e2       	ldi	r22, 0x20	; 32
- 266:	ce 01       	movw	r24, r28
- 268:	01 96       	adiw	r24, 0x01	; 1
- 26a:	0e 94 67 01 	call	0x2ce	; 0x2ce <GetCRC8Index>
- 26e:	18 2f       	mov	r17, r24
+ 280:	4a e3       	ldi	r20, 0x3A	; 58
+ 282:	60 e2       	ldi	r22, 0x20	; 32
+ 284:	ce 01       	movw	r24, r28
+ 286:	01 96       	adiw	r24, 0x01	; 1
+ 288:	0e 94 76 01 	call	0x2ec	; 0x2ec <GetCRC8Index>
+ 28c:	18 2f       	mov	r17, r24
 		
+		// Info Blink
 		blink();
- 270:	0e 94 db 00 	call	0x1b6	; 0x1b6 <blink>
+ 28e:	0e 94 ea 00 	call	0x1d4	; 0x1d4 <blink>
 		
+		// Add CRC8 byte
 		input[index_crc8] = Crc8(input, index_crc8);
- 274:	61 2f       	mov	r22, r17
- 276:	ce 01       	movw	r24, r28
- 278:	01 96       	adiw	r24, 0x01	; 1
- 27a:	0e 94 53 01 	call	0x2a6	; 0x2a6 <Crc8>
- 27e:	e1 e0       	ldi	r30, 0x01	; 1
- 280:	f0 e0       	ldi	r31, 0x00	; 0
- 282:	ec 0f       	add	r30, r28
- 284:	fd 1f       	adc	r31, r29
- 286:	e1 0f       	add	r30, r17
- 288:	f1 1d       	adc	r31, r1
- 28a:	80 83       	st	Z, r24
+ 292:	61 2f       	mov	r22, r17
+ 294:	ce 01       	movw	r24, r28
+ 296:	01 96       	adiw	r24, 0x01	; 1
+ 298:	0e 94 62 01 	call	0x2c4	; 0x2c4 <Crc8>
+ 29c:	e1 e0       	ldi	r30, 0x01	; 1
+ 29e:	f0 e0       	ldi	r31, 0x00	; 0
+ 2a0:	ec 0f       	add	r30, r28
+ 2a2:	fd 1f       	adc	r31, r29
+ 2a4:	e1 0f       	add	r30, r17
+ 2a6:	f1 1d       	adc	r31, r1
+ 2a8:	80 83       	st	Z, r24
 		
+		// Send response
 		USART_Transmit_Str(input);
- 28c:	ce 01       	movw	r24, r28
- 28e:	01 96       	adiw	r24, 0x01	; 1
- 290:	0e 94 ad 00 	call	0x15a	; 0x15a <USART_Transmit_Str>
+ 2aa:	ce 01       	movw	r24, r28
+ 2ac:	01 96       	adiw	r24, 0x01	; 1
+ 2ae:	0e 94 bc 00 	call	0x178	; 0x178 <USART_Transmit_Str>
 		USART_Transmit_Str("\r\n");
- 294:	80 e0       	ldi	r24, 0x00	; 0
- 296:	91 e0       	ldi	r25, 0x01	; 1
- 298:	0e 94 ad 00 	call	0x15a	; 0x15a <USART_Transmit_Str>
+ 2b2:	80 e0       	ldi	r24, 0x00	; 0
+ 2b4:	91 e0       	ldi	r25, 0x01	; 1
+ 2b6:	0e 94 bc 00 	call	0x178	; 0x178 <USART_Transmit_Str>
 		
+		// Clean array
 		Clean_Data(input);
- 29c:	ce 01       	movw	r24, r28
- 29e:	01 96       	adiw	r24, 0x01	; 1
- 2a0:	0e 94 ea 00 	call	0x1d4	; 0x1d4 <Clean_Data>
- 2a4:	da cf       	rjmp	.-76     	; 0x25a <main+0x2a>
+ 2ba:	ce 01       	movw	r24, r28
+ 2bc:	01 96       	adiw	r24, 0x01	; 1
+ 2be:	0e 94 f9 00 	call	0x1f2	; 0x1f2 <Clean_Data>
+ 2c2:	da cf       	rjmp	.-76     	; 0x278 <main+0x2a>
 
-000002a6 <Crc8>:
-	0x3B, 0x0A, 0x59, 0x68, 0xFF, 0xCE, 0x9D, 0xAC
-};
-
-uint8_t Crc8(uint8_t *pcBlock, uint8_t len) {
-	uint8_t crc = 0xFF;
-	for (int i = 0; i < len; i++) {
- 2a6:	66 23       	and	r22, r22
- 2a8:	81 f0       	breq	.+32     	; 0x2ca <Crc8+0x24>
- 2aa:	dc 01       	movw	r26, r24
- 2ac:	9c 01       	movw	r18, r24
- 2ae:	26 0f       	add	r18, r22
- 2b0:	31 1d       	adc	r19, r1
- 2b2:	8f ef       	ldi	r24, 0xFF	; 255
-		//crc = pgm_read_byte(&Crc8Table[crc ^ *pcBlock++]);
-		crc = Crc8Table[crc ^ *pcBlock++];
- 2b4:	ed 91       	ld	r30, X+
- 2b6:	8e 27       	eor	r24, r30
- 2b8:	e8 2f       	mov	r30, r24
- 2ba:	f0 e0       	ldi	r31, 0x00	; 0
- 2bc:	ed 5f       	subi	r30, 0xFD	; 253
- 2be:	fe 4f       	sbci	r31, 0xFE	; 254
- 2c0:	80 81       	ld	r24, Z
-	0x3B, 0x0A, 0x59, 0x68, 0xFF, 0xCE, 0x9D, 0xAC
-};
-
-uint8_t Crc8(uint8_t *pcBlock, uint8_t len) {
-	uint8_t crc = 0xFF;
-	for (int i = 0; i < len; i++) {
- 2c2:	a2 17       	cp	r26, r18
- 2c4:	b3 07       	cpc	r27, r19
- 2c6:	b1 f7       	brne	.-20     	; 0x2b4 <Crc8+0xe>
- 2c8:	08 95       	ret
-	0x82, 0xB3, 0xE0, 0xD1, 0x46, 0x77, 0x24, 0x15,
-	0x3B, 0x0A, 0x59, 0x68, 0xFF, 0xCE, 0x9D, 0xAC
-};
-
-uint8_t Crc8(uint8_t *pcBlock, uint8_t len) {
-	uint8_t crc = 0xFF;
- 2ca:	8f ef       	ldi	r24, 0xFF	; 255
-		//crc = pgm_read_byte(&Crc8Table[crc ^ *pcBlock++]);
-		crc = Crc8Table[crc ^ *pcBlock++];
-	}
-
-	return crc;
-}
- 2cc:	08 95       	ret
-
-000002ce <GetCRC8Index>:
-
-// frame_size = 32
-// end_line = 13
-byte GetCRC8Index(byte *input_data, uint8_t frame_size, uint8_t end_line) {
- 2ce:	fc 01       	movw	r30, r24
-	uint8_t x = 0;
-	for (uint8_t i = 0; i < frame_size; i++) {
- 2d0:	66 23       	and	r22, r22
- 2d2:	99 f0       	breq	.+38     	; 0x2fa <GetCRC8Index+0x2c>
-		if (input_data[i] == end_line) {
- 2d4:	80 81       	ld	r24, Z
- 2d6:	48 13       	cpse	r20, r24
- 2d8:	09 c0       	rjmp	.+18     	; 0x2ec <GetCRC8Index+0x1e>
- 2da:	04 c0       	rjmp	.+8      	; 0x2e4 <GetCRC8Index+0x16>
- 2dc:	21 91       	ld	r18, Z+
- 2de:	24 13       	cpse	r18, r20
- 2e0:	07 c0       	rjmp	.+14     	; 0x2f0 <GetCRC8Index+0x22>
- 2e2:	01 c0       	rjmp	.+2      	; 0x2e6 <GetCRC8Index+0x18>
-
-// frame_size = 32
-// end_line = 13
-byte GetCRC8Index(byte *input_data, uint8_t frame_size, uint8_t end_line) {
-	uint8_t x = 0;
-	for (uint8_t i = 0; i < frame_size; i++) {
- 2e4:	90 e0       	ldi	r25, 0x00	; 0
-		if (input_data[i] == end_line) {
-			return i - 1;
- 2e6:	8f ef       	ldi	r24, 0xFF	; 255
- 2e8:	89 0f       	add	r24, r25
+000002c4 <Crc8>:
+ 2c4:	66 23       	and	r22, r22
+ 2c6:	81 f0       	breq	.+32     	; 0x2e8 <Crc8+0x24>
+ 2c8:	dc 01       	movw	r26, r24
+ 2ca:	9c 01       	movw	r18, r24
+ 2cc:	26 0f       	add	r18, r22
+ 2ce:	31 1d       	adc	r19, r1
+ 2d0:	8f ef       	ldi	r24, 0xFF	; 255
+ 2d2:	ed 91       	ld	r30, X+
+ 2d4:	8e 27       	eor	r24, r30
+ 2d6:	e8 2f       	mov	r30, r24
+ 2d8:	f0 e0       	ldi	r31, 0x00	; 0
+ 2da:	ed 5f       	subi	r30, 0xFD	; 253
+ 2dc:	fe 4f       	sbci	r31, 0xFE	; 254
+ 2de:	80 81       	ld	r24, Z
+ 2e0:	a2 17       	cp	r26, r18
+ 2e2:	b3 07       	cpc	r27, r19
+ 2e4:	b1 f7       	brne	.-20     	; 0x2d2 <Crc8+0xe>
+ 2e6:	08 95       	ret
+ 2e8:	8f ef       	ldi	r24, 0xFF	; 255
  2ea:	08 95       	ret
- 2ec:	31 96       	adiw	r30, 0x01	; 1
-// frame_size = 32
-// end_line = 13
-byte GetCRC8Index(byte *input_data, uint8_t frame_size, uint8_t end_line) {
-	uint8_t x = 0;
-	for (uint8_t i = 0; i < frame_size; i++) {
-		if (input_data[i] == end_line) {
- 2ee:	90 e0       	ldi	r25, 0x00	; 0
-			return i - 1;
-		}
-		
-		x++;
- 2f0:	9f 5f       	subi	r25, 0xFF	; 255
 
-// frame_size = 32
-// end_line = 13
-byte GetCRC8Index(byte *input_data, uint8_t frame_size, uint8_t end_line) {
-	uint8_t x = 0;
-	for (uint8_t i = 0; i < frame_size; i++) {
- 2f2:	69 13       	cpse	r22, r25
- 2f4:	f3 cf       	rjmp	.-26     	; 0x2dc <GetCRC8Index+0xe>
-		if (input_data[i] == end_line) {
-			return i - 1;
-		}
-		
-		x++;
- 2f6:	86 2f       	mov	r24, r22
- 2f8:	08 95       	ret
-}
+000002ec <GetCRC8Index>:
+ 2ec:	fc 01       	movw	r30, r24
+ 2ee:	66 23       	and	r22, r22
+ 2f0:	99 f0       	breq	.+38     	; 0x318 <GetCRC8Index+0x2c>
+ 2f2:	80 81       	ld	r24, Z
+ 2f4:	48 13       	cpse	r20, r24
+ 2f6:	09 c0       	rjmp	.+18     	; 0x30a <GetCRC8Index+0x1e>
+ 2f8:	04 c0       	rjmp	.+8      	; 0x302 <GetCRC8Index+0x16>
+ 2fa:	21 91       	ld	r18, Z+
+ 2fc:	24 13       	cpse	r18, r20
+ 2fe:	07 c0       	rjmp	.+14     	; 0x30e <GetCRC8Index+0x22>
+ 300:	01 c0       	rjmp	.+2      	; 0x304 <GetCRC8Index+0x18>
+ 302:	90 e0       	ldi	r25, 0x00	; 0
+ 304:	8f ef       	ldi	r24, 0xFF	; 255
+ 306:	89 0f       	add	r24, r25
+ 308:	08 95       	ret
+ 30a:	31 96       	adiw	r30, 0x01	; 1
+ 30c:	90 e0       	ldi	r25, 0x00	; 0
+ 30e:	9f 5f       	subi	r25, 0xFF	; 255
+ 310:	69 13       	cpse	r22, r25
+ 312:	f3 cf       	rjmp	.-26     	; 0x2fa <GetCRC8Index+0xe>
+ 314:	86 2f       	mov	r24, r22
+ 316:	08 95       	ret
+ 318:	80 e0       	ldi	r24, 0x00	; 0
+ 31a:	08 95       	ret
 
-// frame_size = 32
-// end_line = 13
-byte GetCRC8Index(byte *input_data, uint8_t frame_size, uint8_t end_line) {
-	uint8_t x = 0;
- 2fa:	80 e0       	ldi	r24, 0x00	; 0
-		
-		x++;
-	}
-	
-	return x;
- 2fc:	08 95       	ret
+0000031c <_exit>:
+ 31c:	f8 94       	cli
 
-000002fe <_exit>:
- 2fe:	f8 94       	cli
-
-00000300 <__stop_program>:
- 300:	ff cf       	rjmp	.-2      	; 0x300 <__stop_program>
+0000031e <__stop_program>:
+ 31e:	ff cf       	rjmp	.-2      	; 0x31e <__stop_program>

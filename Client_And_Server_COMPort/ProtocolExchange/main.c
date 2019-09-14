@@ -56,12 +56,20 @@ void USART_Receive_Str(byte *calledstring) {
 	
 	int i = 0;	
 	while(1) {		
-		ch = USART_Receive();
-		if (ch == CHR_LINE_FEED) {
-			calledstring[i] = CHR_LINE_FEED;	
+		if (i == FRAME_SIZE) {
 			return;
+		}		
+		
+		ch = USART_Receive();
+		if (ch == CHR_LINE_FEED && i > 1) {
+			if (calledstring[--i] == CHR_CARRET_RETURN) {
+				calledstring[i] = CHR_LINE_FEED;	
+				return;
+			} else {
+				calledstring[i] = ch;
+			}
 		} else {
-			calledstring[i] = ch;			
+			calledstring[i] = ch;		
 		}
 		
 		/*
@@ -115,6 +123,7 @@ void Clean_Data(byte *input_data) {
 	}
 }
 
+// Watch dog
 ISR(WDT_vect) {
 	wdt_reset();
 
@@ -124,29 +133,29 @@ ISR(WDT_vect) {
 }
 
 int main(void) {
-	DDRB = 0xFF; //PORTC as Output
+	DDRB = 0xFF; //PORTB as Output
 	
 	byte input[FRAME_SIZE] = { 0 };
 	USART_Init();       
 	
 	while(1) {
-		// Get message
+		// Get request
 		USART_Receive_Str(input);
 		
-		// Get CRC8 index
+		// Get CRC8 byte index
 		byte index_crc8 = GetCRC8Index(input, FRAME_SIZE, CHR_COLON);
 		
-		// Information Blink
+		// Info Blink
 		blink();
 		
-		// Add CRC8
+		// Add CRC8 byte
 		input[index_crc8] = Crc8(input, index_crc8);
 		
-		// Send answer
+		// Send response
 		USART_Transmit_Str(input);
 		USART_Transmit_Str("\r\n");
 		
-		// Clean variable
+		// Clean array
 		Clean_Data(input);
 	}
 	

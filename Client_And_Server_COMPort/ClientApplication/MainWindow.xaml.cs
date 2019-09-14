@@ -80,11 +80,11 @@ namespace ClientAppNameSpace
                 for (int i = 0; i < 100000; i++)
                 {
                     char[] msg = new char[Const.FRAME_LENGTH];
-                    msg[0] = ':';
-                    msg[1] = (char)i;
-                    msg[2] = (char)149;
+                    msg[0] = Const.CHR_COLON;
+                    msg[1] = Const.CHR_MOTOR_X;
+                    msg[2] = Const.CHR_FUNC_MOVE_UP;
                     msg[3] = (char)150;
-                    msg[4] = (char)151;
+                    msg[4] = (char)i;
                     msg[5] = (char)152;
                     msg[6] = (char)153;
                     msg[7] = (char)154;
@@ -94,10 +94,10 @@ namespace ClientAppNameSpace
                     // Временное произвольное значение в качестве одного из параметров, для проверки CRC8
                     msg[11] = (char)rand.Next(256);
 
-                    msg[14] = ':';
-                    msg[15] = '\r';
-                    msg[16] = '\n';
-                    //msg[16] = '\n';
+                    msg[13] = Const.CHR_COLON;
+                    msg[14] = '\r';
+                    msg[15] = '\n';
+                    msg[16] = ' ';
 
                     // Проверка на служебные символы и что-то сделать с ним если вдруг символ обнаружен
                     tc_item.CheckEndChar(msg, (byte)i);

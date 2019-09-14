@@ -3,7 +3,7 @@ Archive member included to satisfy reference by file (symbol)
 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
                               C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.2.209/gcc/dev/atmega328p/avr5/crtatmega328p.o (exit)
 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_copy_data.o)
-                              main.o (__do_copy_data)
+                              Src/Crc8.o (__do_copy_data)
 
 Discarded input sections
 
@@ -12,6 +12,7 @@ Discarded input sections
  .text          0x00000000        0x0 main.o
  .data          0x00000000        0x0 main.o
  .bss           0x00000000        0x0 main.o
+ .text.blink    0x00000000       0x1e main.o
  .text          0x00000000        0x0 Src/Crc8.o
  .data          0x00000000        0x0 Src/Crc8.o
  .bss           0x00000000        0x0 Src/Crc8.o
@@ -264,27 +265,25 @@ END GROUP
                 0x000000fe       0x10 main.o
                 0x000000fe                USART_Receive
  .text.USART_Receive_Str
-                0x0000010e       0x5a main.o
+                0x0000010e       0x6c main.o
                 0x0000010e                USART_Receive_Str
  .text.USART_Send
-                0x00000168       0x10 main.o
-                0x00000168                USART_Send
+                0x0000017a       0x10 main.o
+                0x0000017a                USART_Send
  .text.USART_Transmit_Str
-                0x00000178       0x3e main.o
-                0x00000178                USART_Transmit_Str
+                0x0000018a       0x3e main.o
+                0x0000018a                USART_Transmit_Str
  .text.blink_WD
-                0x000001b6       0x1e main.o
-                0x000001b6                blink_WD
- .text.blink    0x000001d4       0x1e main.o
-                0x000001d4                blink
+                0x000001c8       0x1e main.o
+                0x000001c8                blink_WD
  .text.Clean_Data
-                0x000001f2        0xe main.o
-                0x000001f2                Clean_Data
+                0x000001e6        0xe main.o
+                0x000001e6                Clean_Data
  .text.__vector_6
-                0x00000200       0x4e main.o
-                0x00000200                __vector_6
- .text.main     0x0000024e       0x76 main.o
-                0x0000024e                main
+                0x000001f4       0x4e main.o
+                0x000001f4                __vector_6
+ .text.main     0x00000242       0x82 main.o
+                0x00000242                main
  .text.Crc8     0x000002c4       0x28 Src/Crc8.o
                 0x000002c4                Crc8
  .text.GetCRC8Index
@@ -317,38 +316,35 @@ END GROUP
  *(.fini0)
                 0x00000320                _etext = .
 
-.data           0x00800100      0x104 load address 0x00000320
+.data           0x00800100      0x100 load address 0x00000320
                 0x00800100                PROVIDE (__data_start, .)
  *(.data)
  *(.data*)
  *(.gnu.linkonce.d*)
  *(.rodata)
  *(.rodata*)
- .rodata.str1.1
-                0x00800100        0x3 main.o
  .rodata.Crc8Table
-                0x00800103      0x100 Src/Crc8.o
-                0x00800103                Crc8Table
+                0x00800100      0x100 Src/Crc8.o
+                0x00800100                Crc8Table
  *(.gnu.linkonce.r*)
-                0x00800204                . = ALIGN (0x2)
- *fill*         0x00800203        0x1 
-                0x00800204                _edata = .
-                0x00800204                PROVIDE (__data_end, .)
+                0x00800200                . = ALIGN (0x2)
+                0x00800200                _edata = .
+                0x00800200                PROVIDE (__data_end, .)
 
-.bss            0x00800204        0x0
+.bss            0x00800200        0x0
                 [!provide]                PROVIDE (__bss_start, .)
  *(.bss)
  *(.bss*)
  *(COMMON)
                 [!provide]                PROVIDE (__bss_end, .)
                 0x00000320                __data_load_start = LOADADDR (.data)
-                0x00000424                __data_load_end = (__data_load_start + SIZEOF (.data))
+                0x00000420                __data_load_end = (__data_load_start + SIZEOF (.data))
 
-.noinit         0x00800204        0x0
+.noinit         0x00800200        0x0
                 [!provide]                PROVIDE (__noinit_start, .)
  *(.noinit*)
                 [!provide]                PROVIDE (__noinit_end, .)
-                0x00800204                _end = .
+                0x00800200                _end = .
                 [!provide]                PROVIDE (__heap_start, .)
 
 .eeprom         0x00810000        0x0
@@ -424,41 +420,41 @@ END GROUP
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000      0xce6
+.debug_info     0x00000000      0xd74
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x00000000      0x5f4 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.2.209/gcc/dev/atmega328p/avr5/crtatmega328p.o
- .debug_info    0x000005f4      0x56e main.o
- .debug_info    0x00000b62      0x184 Src/Crc8.o
+ .debug_info    0x000005f4      0x5fc main.o
+ .debug_info    0x00000bf0      0x184 Src/Crc8.o
 
-.debug_abbrev   0x00000000      0x885
+.debug_abbrev   0x00000000      0x89d
  *(.debug_abbrev)
  .debug_abbrev  0x00000000      0x5a2 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.2.209/gcc/dev/atmega328p/avr5/crtatmega328p.o
- .debug_abbrev  0x000005a2      0x216 main.o
- .debug_abbrev  0x000007b8       0xcd Src/Crc8.o
+ .debug_abbrev  0x000005a2      0x22e main.o
+ .debug_abbrev  0x000007d0       0xcd Src/Crc8.o
 
-.debug_line     0x00000000      0x63e
+.debug_line     0x00000000      0x640
  *(.debug_line .debug_line.* .debug_line_end)
  .debug_line    0x00000000      0x133 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.2.209/gcc/dev/atmega328p/avr5/crtatmega328p.o
- .debug_line    0x00000133      0x3f3 main.o
- .debug_line    0x00000526      0x118 Src/Crc8.o
+ .debug_line    0x00000133      0x3f5 main.o
+ .debug_line    0x00000528      0x118 Src/Crc8.o
 
 .debug_frame    0x00000000      0x170
  *(.debug_frame)
  .debug_frame   0x00000000      0x13c main.o
  .debug_frame   0x0000013c       0x34 Src/Crc8.o
 
-.debug_str      0x00000000      0x519
+.debug_str      0x00000000      0x52f
  *(.debug_str)
  .debug_str     0x00000000      0x208 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.2.209/gcc/dev/atmega328p/avr5/crtatmega328p.o
- .debug_str     0x00000208      0x299 main.o
-                                0x2d7 (size before relaxing)
- .debug_str     0x000004a1       0x78 Src/Crc8.o
+ .debug_str     0x00000208      0x2af main.o
+                                0x2f2 (size before relaxing)
+ .debug_str     0x000004b7       0x78 Src/Crc8.o
                                 0x1bd (size before relaxing)
 
-.debug_loc      0x00000000      0x68a
+.debug_loc      0x00000000      0x6db
  *(.debug_loc)
- .debug_loc     0x00000000      0x4be main.o
- .debug_loc     0x000004be      0x1cc Src/Crc8.o
+ .debug_loc     0x00000000      0x50f main.o
+ .debug_loc     0x0000050f      0x1cc Src/Crc8.o
 
 .debug_macinfo
  *(.debug_macinfo)
@@ -478,10 +474,10 @@ END GROUP
 .debug_pubtypes
  *(.debug_pubtypes)
 
-.debug_ranges   0x00000000       0x70
+.debug_ranges   0x00000000       0x88
  *(.debug_ranges)
- .debug_ranges  0x00000000       0x58 main.o
- .debug_ranges  0x00000058       0x18 Src/Crc8.o
+ .debug_ranges  0x00000000       0x70 main.o
+ .debug_ranges  0x00000070       0x18 Src/Crc8.o
 
 .debug_macro
  *(.debug_macro)

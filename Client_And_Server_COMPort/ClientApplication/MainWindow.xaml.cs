@@ -94,10 +94,10 @@ namespace ClientAppNameSpace
                     // Временное произвольное значение в качестве одного из параметров, для проверки CRC8
                     msg[11] = (char)rand.Next(256);
 
-                    msg[13] = Const.CHR_COLON;
-                    msg[14] = '\r';
-                    msg[15] = '\n';
-                    msg[16] = ' ';
+                    msg[14] = Const.CHR_COLON;
+                    msg[15] = '\r';
+                    msg[16] = '\n';
+                    //msg[16] = ' ';
 
                     // Проверка на служебные символы и что-то сделать с ним если вдруг символ обнаружен
                     tc_item.CheckEndChar(msg, (byte)i);

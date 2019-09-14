@@ -51,8 +51,8 @@ namespace ClientAppNameSpace.Src
                 this._serial_port.DataBits = 8;
 
                 this._serial_port.StopBits = StopBits.Two;
-                this._serial_port.ReadTimeout = 10000; //-1 200
-                this._serial_port.WriteTimeout = 10000; //-1 50
+                this._serial_port.ReadTimeout = 250; //-1 200
+                this._serial_port.WriteTimeout = 250; //-1 50
                 this._serial_port.Handshake = Handshake.None;
                 this._serial_port.Encoding = Encoding.Default;
                 //serial_port.DataReceived += new SerialDataReceivedEventHandler(port_DataReceived);
@@ -74,11 +74,40 @@ namespace ClientAppNameSpace.Src
             }
         }
 
+        public int GetCRC8Index (byte[] transmit_msg_chars)
+        {
+            // Автоматическое получение индекса CRC8
+            for (int i = 0; i < Const.FRAME_LENGTH; i++)
+            {
+                if (i > 0 && transmit_msg_chars[i] == '\n')
+                {
+                    int previous_index = i - 1;
+                    if (transmit_msg_chars[previous_index] == '\r')
+                    {
+                        return i - 3;
+                    } 
+                    else
+                    {
+                        continue;
+                    }
+                }
+                else
+                {
+                    continue;
+                }
+            }
+
+            return -1;
+        }
+
         public string WriteBytes(int index, byte[] transmit_msg_chars)
         {
             try
-            { 
-                int index_crc8 = transmit_msg_chars.Length - 4; // 3 crars - 'crc8' char and ':\r\n' char
+            {
+                int i = GetCRC8Index(transmit_msg_chars);
+                if (i == -1)
+                    throw new Exception("CRC8 index not found.");
+                int index_crc8 = i;
 
                 // Очистим буфер In перед отправкой данных
                 if (this._serial_port.IsOpen)
@@ -113,12 +142,17 @@ namespace ClientAppNameSpace.Src
 
                     try
                     {
+
+
                         do
                         {
                             x = this._serial_port.ReadByte();
                             result[i++] = (char)x;
 
                         } while (x != '\r' || i == result.Length - 1);
+
+
+
                     }
                     catch (ObjectDisposedException)
                     {

@@ -55,48 +55,45 @@ void USART_Receive_Str(byte *calledstring) {
 	char ch;
 	
 	int i = 0;	
-	while(1) {		
+	while(1) {				
+		// Обработка ошибок при приеме запроса
 		if (i == FRAME_SIZE) {
 			return;
 		}		
-		
+	
+		// Get input char	
 		ch = USART_Receive();
-		if (ch == CHR_LINE_FEED && i > 1) {
-			if (calledstring[--i] == CHR_CARRET_RETURN) {
-				calledstring[i] = CHR_LINE_FEED;	
-				return;
-			} else {
-				calledstring[i] = ch;
-			}
-		} else {
-			calledstring[i] = ch;		
-		}
 		
-		/*
-		if (i > 0 && ch == CHR_LINE_FEED) {
-			if (calledstring[--i] == CHR_CARRET_RETURN) { //Проверить
-				calledstring[i] = CHR_LINE_FEED;
-				return;
+		// Check first char equal COLON
+		if (ch != CHR_COLON && i == 0) {
+			continue;
+		} else {
+			if (ch == CHR_LINE_FEED && i > 0) {
+				int previous_index = i - 1;
+ 				if (calledstring[previous_index] == CHR_CARRET_RETURN) {
+					calledstring[i] = CHR_LINE_FEED;
+					return;
+				} else {
+					calledstring[i] = ch;
+				}
 			} else {
 				calledstring[i] = ch;
-			}
-		} else {
-			calledstring[i] = ch;
+			}	
 		}
-		*/
 		
 		i++;
 	}	
 }
 
 void USART_Send(byte data) {
-	while( !(UCSR0A & (1<<UDRE0)) );
+	while( !(UCSR0A & ( 1 << UDRE0 )) );
 	UDR0 = data;
 }
 
 void USART_Transmit_Str(byte *calledstring) {
-	for (int i = 0; i < FRAME_SIZE; i++) {
+	for (int i = 0; i <= FRAME_SIZE; i++) {
 		if (calledstring[i] != 0)
+			// Send char
 			USART_Send(calledstring[i]);
 		else 
 			break;		
@@ -144,16 +141,53 @@ int main(void) {
 		
 		// Get CRC8 byte index
 		byte index_crc8 = GetCRC8Index(input, FRAME_SIZE, CHR_COLON);
-		
-		// Info Blink
-		blink();
-		
+			
 		// Add CRC8 byte
-		input[index_crc8] = Crc8(input, index_crc8);
+		byte crc8 = Crc8(input, index_crc8);
+		input[index_crc8] = crc8;
 		
-		// Send response
-		USART_Transmit_Str(input);
-		USART_Transmit_Str("\r\n");
+		if (input[index_crc8] == crc8) {
+			// Send response
+			byte output[FRAME_SIZE] = { 0 };
+			
+			output[0] = CHR_COLON;
+			output[1] = 2;
+			output[2] = 2;
+			output[3] = 2;
+			output[4] = 2;
+			output[5] = 2;
+			output[6] = 2;
+			output[7] = CHR_COLON;
+			output[8] = CHR_CARRET_RETURN;
+			output[9] = CHR_LINE_FEED;
+			
+			// Send response
+			USART_Transmit_Str(input);
+			USART_Transmit_Str(CHR_COLON);
+			USART_Transmit_Str(CHR_CARRET_RETURN);
+			USART_Transmit_Str(CHR_LINE_FEED);
+		} else {
+			// Info Blink
+			blink();
+	
+			byte output[FRAME_SIZE] = { 0 };
+			
+			output[1] = CHR_COLON;
+			output[2] = 2;
+			output[3] = "2";
+			output[4] = "2";
+			output[5] = "2";
+			output[6] = "2";
+			output[7] = "2";
+			
+			// Send response
+			USART_Transmit_Str(output);
+			USART_Transmit_Str(CHR_COLON);
+			USART_Transmit_Str(CHR_CARRET_RETURN);
+			USART_Transmit_Str(CHR_LINE_FEED);
+		}
+		
+		
 		
 		// Clean array
 		Clean_Data(input);

@@ -143,7 +143,7 @@ namespace ClientAppNameSpace.Src
                     try
                     {
 
-
+                        // NEED REFACTORING
                         do
                         {
                             x = this._serial_port.ReadByte();

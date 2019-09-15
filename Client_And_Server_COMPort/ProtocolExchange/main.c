@@ -157,10 +157,11 @@ int main(void) {
 			output[4] = 2;
 			output[5] = 2;
 			output[6] = 2;
+			/*
 			output[7] = CHR_COLON;
 			output[8] = CHR_CARRET_RETURN;
 			output[9] = CHR_LINE_FEED;
-			
+			*/
 			// Send response
 			USART_Transmit_Str(input);
 			USART_Transmit_Str(CHR_COLON);

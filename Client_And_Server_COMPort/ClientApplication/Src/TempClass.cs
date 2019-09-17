@@ -143,14 +143,28 @@ namespace ClientAppNameSpace.Src
                     try
                     {
 
+                        while (true)
+                        {
+                            x = this._serial_port.ReadByte();
+                            result[i++] = (char)x;
+
+                            if (result[i-1] == '\n')
+                                if (result[i-2] == '\r')
+                                    break;
+                        }
+
+
+                        /*
                         // NEED REFACTORING
                         do
                         {
                             x = this._serial_port.ReadByte();
                             result[i++] = (char)x;
 
-                        } while (x != '\r' || i == result.Length - 1);
 
+
+                        } while (x != '\r' || i == result.Length - 1);
+                        */
 
 
                     }

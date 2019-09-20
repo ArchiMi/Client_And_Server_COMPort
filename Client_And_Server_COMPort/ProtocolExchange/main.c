@@ -147,7 +147,10 @@ int main(void) {
 		input[index_crc8] = crc8;
 		
 		if (input[index_crc8] == crc8) {
-			/*
+			
+			// Info Blink
+			blink();
+			
 			// Send response
 			byte output[FRAME_SIZE] = { 0 };			
 			output[0] = CHR_COLON;
@@ -157,10 +160,6 @@ int main(void) {
 			output[4] = 2;
 			output[5] = 2;
 			output[6] = 2;
-			output[7] = CHR_COLON;
-			output[8] = CHR_CARRET_RETURN;
-			output[9] = CHR_LINE_FEED;
-			*/
 			
 			// Send response
 			USART_Transmit_Str(input);

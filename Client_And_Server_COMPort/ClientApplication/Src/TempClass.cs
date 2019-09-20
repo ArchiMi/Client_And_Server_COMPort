@@ -86,7 +86,7 @@ namespace ClientAppNameSpace.Src
         public int GetCRC8Index (byte[] transmit_msg_chars)
         {
             // Автоматическое получение индекса CRC8
-            for (int i = 0; i < Const.FRAME_LENGTH; i++)
+            for (int i = 0; i < transmit_msg_chars.Count(); i++)
             {
                 if (i > 0 && transmit_msg_chars[i] == '\n')
                 {

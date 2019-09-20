@@ -13,19 +13,19 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY
   4 .debug_aranges 00000090  00000000  00000000  00000504  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_info   00000d67  00000000  00000000  00000594  2**0
+  5 .debug_info   00000d32  00000000  00000000  00000594  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_abbrev 0000089d  00000000  00000000  000012fb  2**0
+  6 .debug_abbrev 0000089d  00000000  00000000  000012c6  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_line   00000640  00000000  00000000  00001b98  2**0
+  7 .debug_line   00000640  00000000  00000000  00001b63  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_frame  00000170  00000000  00000000  000021d8  2**2
+  8 .debug_frame  00000170  00000000  00000000  000021a4  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    0000052f  00000000  00000000  00002348  2**0
+  9 .debug_str    00000528  00000000  00000000  00002314  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_loc    000006db  00000000  00000000  00002877  2**0
+ 10 .debug_loc    000006db  00000000  00000000  0000283c  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_ranges 00000088  00000000  00000000  00002f52  2**0
+ 11 .debug_ranges 00000088  00000000  00000000  00002f17  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -387,30 +387,32 @@ int main(void) {
  294:	e1 0f       	add	r30, r17
  296:	f1 1d       	adc	r31, r1
  298:	80 83       	st	Z, r24
-			output[7] = CHR_COLON;
 			output[8] = CHR_CARRET_RETURN;
 			output[9] = CHR_LINE_FEED;
 			*/
+			
 			// Send response
 			USART_Transmit_Str(input);
  29a:	ce 01       	movw	r24, r28
  29c:	01 96       	adiw	r24, 0x01	; 1
  29e:	0e 94 c5 00 	call	0x18a	; 0x18a <USART_Transmit_Str>
-			USART_Transmit_Str(CHR_COLON);
+			// Send response
+			USART_Transmit_Str(output);
+		}
+		
+		// End message
+		USART_Transmit_Str(CHR_COLON);
  2a2:	8a e3       	ldi	r24, 0x3A	; 58
  2a4:	90 e0       	ldi	r25, 0x00	; 0
  2a6:	0e 94 c5 00 	call	0x18a	; 0x18a <USART_Transmit_Str>
-			USART_Transmit_Str(CHR_CARRET_RETURN);
+		USART_Transmit_Str(CHR_CARRET_RETURN);
  2aa:	8d e0       	ldi	r24, 0x0D	; 13
  2ac:	90 e0       	ldi	r25, 0x00	; 0
  2ae:	0e 94 c5 00 	call	0x18a	; 0x18a <USART_Transmit_Str>
-			USART_Transmit_Str(CHR_LINE_FEED);
+		USART_Transmit_Str(CHR_LINE_FEED);
  2b2:	8a e0       	ldi	r24, 0x0A	; 10
  2b4:	90 e0       	ldi	r25, 0x00	; 0
  2b6:	0e 94 c5 00 	call	0x18a	; 0x18a <USART_Transmit_Str>
-		}
-		
-		
 		
 		// Clean array
 		Clean_Data(input);

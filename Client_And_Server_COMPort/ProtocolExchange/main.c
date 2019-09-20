@@ -147,9 +147,9 @@ int main(void) {
 		input[index_crc8] = crc8;
 		
 		if (input[index_crc8] == crc8) {
+			/*
 			// Send response
-			byte output[FRAME_SIZE] = { 0 };
-			
+			byte output[FRAME_SIZE] = { 0 };			
 			output[0] = CHR_COLON;
 			output[1] = 2;
 			output[2] = 2;
@@ -157,38 +157,35 @@ int main(void) {
 			output[4] = 2;
 			output[5] = 2;
 			output[6] = 2;
-			/*
 			output[7] = CHR_COLON;
 			output[8] = CHR_CARRET_RETURN;
 			output[9] = CHR_LINE_FEED;
 			*/
+			
 			// Send response
 			USART_Transmit_Str(input);
-			USART_Transmit_Str(CHR_COLON);
-			USART_Transmit_Str(CHR_CARRET_RETURN);
-			USART_Transmit_Str(CHR_LINE_FEED);
-		} else {
+		} else /* ERROR */ {
 			// Info Blink
 			blink();
 	
-			byte output[FRAME_SIZE] = { 0 };
+			byte answer[FRAME_SIZE] = { 0 };
 			
-			output[1] = CHR_COLON;
-			output[2] = 2;
-			output[3] = "2";
-			output[4] = "2";
-			output[5] = "2";
-			output[6] = "2";
-			output[7] = "2";
+			answer[1] = CHR_COLON;
+			answer[2] = 2;
+			answer[3] = "2";
+			answer[4] = "2";
+			answer[5] = "2";
+			answer[6] = "2";
+			answer[7] = "2";
 			
 			// Send response
-			USART_Transmit_Str(output);
-			USART_Transmit_Str(CHR_COLON);
-			USART_Transmit_Str(CHR_CARRET_RETURN);
-			USART_Transmit_Str(CHR_LINE_FEED);
+			USART_Transmit_Str(answer);
 		}
 		
-		
+		// Send end message chars
+		USART_Transmit_Str(CHR_COLON);
+		USART_Transmit_Str(CHR_CARRET_RETURN);
+		USART_Transmit_Str(CHR_LINE_FEED);
 		
 		// Clean array
 		Clean_Data(input);

@@ -74,6 +74,15 @@ namespace ClientAppNameSpace.Src
             }
         }
 
+        public void CheckEndChar(List<char> msg, byte value)
+        {
+            for (int i = 0; i < msg.Count - 1; i++)
+            {
+                if (msg[i] == '\0' || msg[i] > 255)
+                    msg[i] = (char)1;
+            }
+        }
+
         public int GetCRC8Index (byte[] transmit_msg_chars)
         {
             // Автоматическое получение индекса CRC8
@@ -83,18 +92,37 @@ namespace ClientAppNameSpace.Src
                 {
                     int previous_index = i - 1;
                     if (transmit_msg_chars[previous_index] == '\r')
-                    {
                         return i - 3;
-                    } 
                     else
-                    {
                         continue;
-                    }
                 }
                 else
-                {
                     continue;
+            }
+
+            return -1;
+        }
+
+        public int GetCRC8Index(string transmit_msg_chars)
+        {
+            string[] msg = transmit_msg_chars.Split(',');
+
+            int i = 0;
+
+            // Автоматическое получение индекса CRC8
+            //for (int i = 0; i < Const.FRAME_LENGTH; i++)
+            foreach (string item in msg)
+            {
+                char ch = (char)byte.Parse(item);
+                if (i > 1 && ch == '\n')
+                {
+                    int previous_index = i - 1;
+                    char ch_prev = (char)byte.Parse(msg[previous_index]);
+                    if (ch_prev == '\r')
+                        return i - 3;
                 }
+
+                i++;
             }
 
             return -1;
@@ -135,6 +163,7 @@ namespace ClientAppNameSpace.Src
             try
             { 
                 char[] result = new char[Const.FRAME_LENGTH];
+                byte[] result_byte = new byte[Const.FRAME_LENGTH];
                 try
                 {
                     int i = 0;
@@ -142,31 +171,19 @@ namespace ClientAppNameSpace.Src
 
                     try
                     {
-
                         while (true)
                         {
                             x = this._serial_port.ReadByte();
-                            result[i++] = (char)x;
+                            result[i] = (char)x;
+                            result_byte[i] = (byte)x;
 
-                            if (result[i-1] == '\n')
-                                if (result[i-2] == '\r')
-                                    break;
+                            if (i > 0)
+                                if (result[i-1] == '\n')
+                                    if (result[i-2] == '\r')
+                                        break;
+
+                            i++;
                         }
-
-
-                        /*
-                        // NEED REFACTORING
-                        do
-                        {
-                            x = this._serial_port.ReadByte();
-                            result[i++] = (char)x;
-
-
-
-                        } while (x != '\r' || i == result.Length - 1);
-                        */
-
-
                     }
                     catch (ObjectDisposedException)
                     {
@@ -176,7 +193,7 @@ namespace ClientAppNameSpace.Src
                     {
                         //MessageBox.Show($"{ex.Message} (index={i})");
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
                         //MessageBox.Show($"{ex.Message} (index={i})");
                     }

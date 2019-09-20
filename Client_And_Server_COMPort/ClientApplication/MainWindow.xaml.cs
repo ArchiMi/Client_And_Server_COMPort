@@ -1,5 +1,6 @@
 ﻿using ClientAppNameSpace.Src;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.IO.Ports;
 using System.Linq;
@@ -89,15 +90,37 @@ namespace ClientAppNameSpace
                     msg[6] = (char)153;
                     msg[7] = (char)154;
                     msg[8] = (char)155;
-                    msg[9] = (char)0;
+                    msg[9] = (char)1;
 
                     // Временное произвольное значение в качестве одного из параметров, для проверки CRC8
                     msg[11] = (char)rand.Next(256);
 
-                    msg[14] = Const.CHR_COLON;
-                    msg[15] = '\r';
-                    msg[16] = '\n';
-                    //msg[16] = ' ';
+                    msg[13] = Const.CHR_COLON;
+                    msg[14] = '\r';
+                    msg[15] = '\n';
+                    msg[16] = ' ';
+                        
+                    /*
+                    List<char> msg = new List<char>();
+                    msg.Add(Const.CHR_COLON);
+                    msg.Add(Const.CHR_MOTOR_X);
+                    msg.Add(Const.CHR_FUNC_MOVE_UP);
+                    msg.Add((char)150);
+                    msg.Add((char)i);
+                    msg.Add((char)152);
+                    msg.Add((char)153);
+                    msg.Add((char)154);
+                    msg.Add((char)155);
+                    msg.Add((char)0);
+
+                    // Временное произвольное значение в качестве одного из параметров, для проверки CRC8
+                    msg.Add((char)rand.Next(256));
+
+                    msg.Add(Const.CHR_COLON);
+                    msg.Add('\r');
+                    msg.Add('\n');
+                    msg.Add(' ');
+                    */
 
                     // Проверка на служебные символы и что-то сделать с ним если вдруг символ обнаружен
                     tc_item.CheckEndChar(msg, (byte)i);
@@ -118,9 +141,23 @@ namespace ClientAppNameSpace
                         //string message = $"[{index.ToString("000000000")}] : ==> '{temp_src_msg}' and '{temp_res_msg}'";
                         string message = $" => '{temp_transmit_msg}' and '{temp_res_msg}'";
 
-                        char transmit_crc8_char = temp_transmit_msg[temp_transmit_msg.Length - 2];
-                        char receiv_crc8_char = temp_res_msg[temp_res_msg.Length - 2];
-                        bool is_error = transmit_crc8_char == receiv_crc8_char;
+                        // Init Error True!
+                        bool is_error = true;
+
+                        // Index CRC8 Request
+                        int index_crc8_req = tc_item.GetCRC8Index(temp_transmit_msg);
+                        if (index_crc8_req > 0) {
+                            char transmit_crc8_char = temp_transmit_msg[index_crc8_req];
+
+                            // Index CRC8 Response
+                            int index_crc8_res =  tc_item.GetCRC8Index(temp_res_msg);
+                            if (index_crc8_res > 0) {
+                                char receiv_crc8_char = temp_res_msg[index_crc8_res];
+
+                                // Equal
+                                is_error = transmit_crc8_char == receiv_crc8_char;
+                            }
+                        }
 
                         this.msg_list.Items.Add(new ItemRecord(i, DateTime.Now, "1", message, "ping", !is_error));
                         this.msg_list.ScrollIntoView(this.msg_list.Items[this.msg_list.Items.Count - 1]);

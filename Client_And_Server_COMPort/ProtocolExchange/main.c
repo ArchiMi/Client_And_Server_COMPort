@@ -1,4 +1,5 @@
 #define F_CPU 16000000UL
+#define NULL ((void*)0)
 
 #include <avr/io.h>
 #include <util/delay.h>
@@ -9,6 +10,35 @@
 #include "Src/Crc8.h"
 
 typedef unsigned char byte;
+
+typedef struct {
+	byte* array;
+	int used;
+	int size;
+} Array;
+
+void initArray(Array* a, size_t initialSize) {
+	a->array = (byte*)malloc(initialSize * sizeof(byte));
+	a->used = 0;
+	a->size = initialSize;
+}
+
+void insertArray(Array* a, byte element_byte) {
+	if (a->used == a->size) {
+		a->size += 1;
+		byte* newarr = (byte*)realloc(a->array, a->size * sizeof(byte));
+		if (newarr == NULL) return; //выделить блок не удалось - выходим без изменени€
+		a->array = newarr;
+	}
+
+	a->array[a->used++] = element_byte;
+}
+
+void freeArray(Array* a) {
+	free(a->array);
+	a->array = NULL;
+	a->used = a->size = 0;
+}
 
 // In table 'Examples of UBRRn Settings' for ATmega328P U2X=1 "7 - 256000 Baud" or 207 - 9600
 //#define BAUD_PRESCALE 207 //207 - 9600 U2X=1
@@ -151,6 +181,23 @@ int main(void) {
 			// Info Blink
 			blink();
 			
+			// **** Test ****
+			Array a;
+			int i;
+			
+			initArray(&a, 5);  // initially 5 elements
+			for (i = 0; i < 100; i++)
+				insertArray(&a, i);  // automatically resizes as necessary
+			
+			int count = a.size;
+			for (i = 0; i < count; i++)
+				a.array[i] = i;
+			
+			//printf("%d\n", a.array[9]);  // print 10th element
+			//printf("%d\n", a.used);  // print number of elements
+			freeArray(&a);
+			//*****************
+			
 			/*
 			// Send response
 			byte output[FRAME_SIZE] = { 0 };			
@@ -170,19 +217,9 @@ int main(void) {
 			
 			// Send response ( ECHO )
 			USART_Transmit_Str(input);
-			USART_Transmit_Str("2");
-			USART_Transmit_Str("2");
-			USART_Transmit_Str("2");
 			USART_Transmit_Str(CHR_COLON);
-			USART_Transmit_Str("4");
-			USART_Transmit_Str("4");
-			USART_Transmit_Str("4");
-			USART_Transmit_Str("4");
 			USART_Transmit_Str(CHR_CARRET_RETURN);
 			USART_Transmit_Str(CHR_LINE_FEED);
-			USART_Transmit_Str("8");
-			USART_Transmit_Str("8");
-			USART_Transmit_Str("8");
 		} else /* ERROR */ {
 			// Info Blink
 			blink();

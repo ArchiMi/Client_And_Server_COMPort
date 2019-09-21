@@ -78,7 +78,7 @@ namespace ClientAppNameSpace
                 //TEST
                 Random rand = new Random();
 
-                for (int i = 0; i < 1000000; i++)
+                for (int i = 0; i < 100000; i++)
                 {
                     /*
                     char[] msg = new char[Const.FRAME_LENGTH];
@@ -115,8 +115,6 @@ namespace ClientAppNameSpace
                     msg.Add((char)0);
 
                     // Временное произвольное значение в качестве одного из параметров, для проверки CRC8
-                    msg.Add((char)rand.Next(256));
-
                     int x = rand.Next(4);
                     for (int j = 0; j < x; j++)
                         msg.Add((char)rand.Next(256));
@@ -125,7 +123,7 @@ namespace ClientAppNameSpace
                     msg.Add(Const.CHR_COLON);
                     msg.Add('\r');
                     msg.Add('\n');
-                    msg.Add(' ');
+                    //msg.Add(' ');
 
                     // Проверка на служебные символы и что-то сделать с ним если вдруг символ обнаружен
                     tc_item.CheckEndChar(msg, (byte)i);

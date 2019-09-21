@@ -51,8 +51,8 @@ namespace ClientAppNameSpace.Src
                 this._serial_port.DataBits = 8;
 
                 this._serial_port.StopBits = StopBits.Two;
-                this._serial_port.ReadTimeout = 250; //-1 200
-                this._serial_port.WriteTimeout = 250; //-1 50
+                this._serial_port.ReadTimeout = 200; //-1 200
+                this._serial_port.WriteTimeout = 200; //-1 50
                 this._serial_port.Handshake = Handshake.None;
                 this._serial_port.Encoding = Encoding.Default;
                 //serial_port.DataReceived += new SerialDataReceivedEventHandler(port_DataReceived);

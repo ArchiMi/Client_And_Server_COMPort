@@ -78,7 +78,7 @@ namespace ClientAppNameSpace
                 //TEST
                 Random rand = new Random();
 
-                for (int i = 0; i < 100000; i++)
+                for (int i = 0; i < 1000000; i++)
                 {
                     /*
                     char[] msg = new char[Const.FRAME_LENGTH];
@@ -147,24 +147,33 @@ namespace ClientAppNameSpace
                         string message = $" => '{temp_transmit_msg}' and '{temp_res_msg}'";
 
                         // Init Error True!
-                        bool is_error = true;
+                        bool is_error = false;
 
                         // Index CRC8 Request
+                        byte transmit_crc8_char = 0;
+                        byte receiv_crc8_char = 0;
                         int index_crc8_req = tc_item.GetCRC8Index(temp_transmit_msg);
                         if (index_crc8_req > 0) {
-                            char transmit_crc8_char = temp_transmit_msg[index_crc8_req];
+                            transmit_crc8_char = byte.Parse(temp_transmit_msg.Split(',')[index_crc8_req]);
 
                             // Index CRC8 Response
                             int index_crc8_res =  tc_item.GetCRC8Index(temp_res_msg);
                             if (index_crc8_res > 0) {
-                                char receiv_crc8_char = temp_res_msg[index_crc8_res];
+                                receiv_crc8_char = byte.Parse(temp_res_msg.Split(',')[index_crc8_res]);
 
                                 // Equal
                                 is_error = transmit_crc8_char == receiv_crc8_char;
                             }
                         }
 
-                        this.msg_list.Items.Add(new ItemRecord(i, DateTime.Now, "1", message, "ping", !is_error));
+                        this.msg_list.Items.Add(new ItemRecord(
+                            i, 
+                            DateTime.Now, 
+                            $"1", 
+                            $"{message}. {transmit_crc8_char} = {receiv_crc8_char}", 
+                            $"ping", 
+                            !is_error)
+                        );
                         this.msg_list.ScrollIntoView(this.msg_list.Items[this.msg_list.Items.Count - 1]);
                     }));
                 }

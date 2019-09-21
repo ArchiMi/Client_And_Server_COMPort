@@ -151,40 +151,59 @@ int main(void) {
 			// Info Blink
 			blink();
 			
+			/*
 			// Send response
 			byte output[FRAME_SIZE] = { 0 };			
 			output[0] = CHR_COLON;
-			output[1] = 2;
+			output[1] = 1;
 			output[2] = 2;
-			output[3] = 2;
-			output[4] = 2;
-			output[5] = 2;
-			output[6] = 2;
+			output[3] = 3;
+			output[4] = 4;
+			output[5] = 5;
+			output[6] = 6;
+			output[7] = CHR_COLON;
+			output[8] = CHR_CARRET_RETURN;
+			output[9] = CHR_LINE_FEED;
+			USART_Transmit_Str(output);
+			USART_Transmit_Str(CHR_CARRET_RETURN);
+			*/
 			
-			// Send response
+			// Send response ( ECHO )
 			USART_Transmit_Str(input);
+			USART_Transmit_Str("2");
+			USART_Transmit_Str("2");
+			USART_Transmit_Str("2");
+			USART_Transmit_Str(CHR_COLON);
+			USART_Transmit_Str("4");
+			USART_Transmit_Str("4");
+			USART_Transmit_Str("4");
+			USART_Transmit_Str("4");
+			USART_Transmit_Str(CHR_CARRET_RETURN);
+			USART_Transmit_Str(CHR_LINE_FEED);
+			USART_Transmit_Str("8");
+			USART_Transmit_Str("8");
+			USART_Transmit_Str("8");
 		} else /* ERROR */ {
 			// Info Blink
 			blink();
 	
-			byte answer[FRAME_SIZE] = { 0 };
-			
+			byte answer[FRAME_SIZE] = { 0 };			
 			answer[1] = CHR_COLON;
-			answer[2] = 2;
-			answer[3] = "2";
-			answer[4] = "2";
-			answer[5] = "2";
-			answer[6] = "2";
-			answer[7] = "2";
+			answer[2] = 3;
+			answer[3] = "3";
+			answer[4] = "3";
+			answer[5] = "3";
+			answer[6] = "3";
+			answer[7] = "3";
 			
 			// Send response
 			USART_Transmit_Str(answer);
+			USART_Transmit_Str(CHR_COLON);
+			
+			// End answer message chars
+			USART_Transmit_Str(CHR_CARRET_RETURN);
+			USART_Transmit_Str(CHR_LINE_FEED);
 		}
-		
-		// Send end message chars
-		USART_Transmit_Str(CHR_COLON);
-		USART_Transmit_Str(CHR_CARRET_RETURN);
-		USART_Transmit_Str(CHR_LINE_FEED);
 		
 		// Clean array
 		Clean_Data(input);

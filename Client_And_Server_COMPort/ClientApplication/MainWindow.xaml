@@ -38,7 +38,7 @@
                     <GridViewColumn Header="Команда" Width="80" DisplayMemberBinding="{Binding CMD}" />
                     <GridViewColumn Header="Статус" Width="50" DisplayMemberBinding="{Binding Status}" />
                     <GridViewColumn Header="Ошибка" Width="55" DisplayMemberBinding="{Binding IsError}" />
-                    <GridViewColumn Header="Описание" Width="670" DisplayMemberBinding="{Binding Message}" />
+                    <GridViewColumn Header="Описание" Width="700" DisplayMemberBinding="{Binding Message}" />
                     <GridViewColumn Header="Balance" Width="50">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>

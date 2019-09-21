@@ -4,4 +4,4 @@
 \Client_And_Server_COMPort\ClientApplication\bin\
 Client_And_Server_COMPort/ClientApplication/bin/
 Client_And_Server_COMPort\ClientApplication\bin\
-sessionn_num
+sessionn_num.log

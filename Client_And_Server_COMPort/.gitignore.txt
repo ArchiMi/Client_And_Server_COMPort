@@ -1,0 +1,2 @@
+Client_And_Server_COMPort/ClientApplication/bin
+C:\Projects\ProtocolProject\Client_And_Server_COMPort\ClientApplication\bin

@@ -12,8 +12,7 @@
 #include <avr/wdt.h>
 #include <avr/interrupt.h>
 #include <stdbool.h>
-
-typedef unsigned char byte;
+#include "const.h"
 
 const byte Crc8Table[] = {
 	0x81, 0x31, 0x62, 0x53, 0xC4, 0xF5, 0xA6, 0x97,

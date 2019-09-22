@@ -4,7 +4,8 @@
  * Created: 18.08.2019 13:04:34
  *  Author: Developer
  */ 
-typedef unsigned char byte;
+
+#include "const.h"
 
 #ifndef CRC8_H_
 #define CRC8_H_

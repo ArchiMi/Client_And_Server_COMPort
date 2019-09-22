@@ -183,7 +183,7 @@ int main(void) {
 			
 		// Add CRC8 byte
 		byte crc8 = Crc8(input, index_crc8);
-		input[index_crc8] = crc8;
+		//input[index_crc8] = crc8;
 		
 		if (input[index_crc8] == crc8) {
 			
@@ -219,18 +219,20 @@ int main(void) {
 			// Info Blink
 			blink();
 	
-			byte answer[FRAME_SIZE] = { 0 };			
-			answer[1] = CHR_COLON;
-			answer[2] = 3;
-			answer[3] = "3";
-			answer[4] = "3";
+			byte answer[FRAME_SIZE] = { 0 };
+			answer[0] = CHR_COLON;
+			answer[1] = crc8;
+			answer[2] = input[index_crc8];
+			answer[3] = index_crc8;
+			answer[4] = "2";
 			answer[5] = "3";
-			answer[6] = "3";
-			answer[7] = "3";
+			answer[6] = "4";
+			answer[7] = CHR_COLON;
+			answer[8] = CHR_CARRET_RETURN;
+			answer[9] = CHR_LINE_FEED;
 			
 			// Send response
 			USART_Transmit_Str(answer);
-			USART_Transmit_Str(CHR_COLON);
 			
 			// End answer message chars
 			USART_Transmit_Str(CHR_CARRET_RETURN);

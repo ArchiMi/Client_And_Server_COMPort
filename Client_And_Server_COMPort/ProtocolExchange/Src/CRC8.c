@@ -61,11 +61,14 @@ uint8_t Crc8(uint8_t *pcBlock, uint8_t len) {
 
 // frame_size = 32
 // end_line = 13
-byte GetCRC8Index(byte *input_data, uint8_t frame_size, uint8_t end_line) {
+byte GetCRC8Index(byte *input_data, uint8_t frame_size) {
 	uint8_t x = 0;
 	for (uint8_t i = 0; i < frame_size; i++) {
-		if (input_data[i] == end_line) {
-			return i - 1;
+		// Need many checkeds
+		if (input_data[i] == CHR_COLON && i > 0) {
+			if (input_data[i+1] == CHR_CARRET_RETURN) {
+				return i - 1;
+			}
 		}
 		
 		x++;

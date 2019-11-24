@@ -26,7 +26,7 @@ void insertArray(Array* a, byte element_byte) {
 	if (a->used == a->size) {
 		a->size += 1;
 		byte* newarr = (byte*)realloc(a->array, a->size * sizeof(byte));
-		if (newarr == NULL) return; // Выделить блок не удалось - выходим без изменения
+		if (newarr == NULL) return; // Block don't selected - return 
 		a->array = newarr;
 	}
 
@@ -59,12 +59,13 @@ void USART_Init() {
 	WDTCSR = 1<<WDIE;
 	
 	//UCSR0A |= (1<<U2X0); //Удвоение частоты
-	UCSR0B = (1<<RXEN0) | (1<<TXEN0); //Разрешаем прием и передачу по USART - T/R ENable = True
+	UCSR0B = (1<<RXEN0) | (1<<TXEN0); //Trust transmit and receive from USART - T/R ENable = True
 	UCSR0C = (0<<UMSEL01) | (0<<UMSEL00) | (1<<USBS0) | (1<<UCSZ00) | (1<<UCSZ01) | (1 << UCSZ00);
 	
 	UBRR0L = BAUD_PRESCALE;
 	UBRR0H = BAUD_PRESCALE >> 8;
 
+	// Не менее 20 милисекунд
 	_delay_ms(20);
 }
 
@@ -73,12 +74,12 @@ byte USART_Receive(void) {
 	return UDR0;	
 }
 
-void USART_Receive_Str(byte *calledstring) {
+void USART_Receive_Str(byte *calledstring, Array* a) {
 	char ch;
 	
 	int i = 0;	
 	while(1) {				
-		// Обработка ошибок при приеме запроса
+		// Check error from receive 
 		if (i == FRAME_SIZE) {
 			return;
 		}		
@@ -94,12 +95,15 @@ void USART_Receive_Str(byte *calledstring) {
 				int previous_index = i - 1;
  				if (calledstring[previous_index] == CHR_CARRET_RETURN) {
 					calledstring[i] = CHR_LINE_FEED;
+					insertArray(a, CHR_LINE_FEED);
 					return;
 				} else {
 					calledstring[i] = ch;
+					insertArray(a, ch);
 				}
 			} else {
 				calledstring[i] = ch;
+				insertArray(a, ch);
 			}	
 		}
 		
@@ -112,7 +116,9 @@ void USART_Send(byte data) {
 	UDR0 = data;
 }
 
+// ERROR ERROR ... called string may be one char, but FRAME_SIZE 32 chars
 void USART_Transmit_Str(byte *calledstring) {
+	// Chars array
 	for (int i = 0; i <= FRAME_SIZE; i++) {
 		if (calledstring[i] != 0)
 			// Send char
@@ -136,6 +142,13 @@ void blink() {
 	_delay_ms(5);
 }
 
+void blinkDebig() {
+	PORTB |= ( 1 << PINB6 ); //0xFF; //On
+	_delay_ms(5);
+	PORTB &= ~( 1 << PINB6 ); //0x00; //OFF
+	_delay_ms(5);
+}
+
 void Clean_Data(byte *input_data) {
 	for (uint8_t i = 0; i < FRAME_SIZE; i++) {
 		input_data[i] = 0;
@@ -155,16 +168,18 @@ void Testfunc() {
 	Array a;
 	int i;
 				
-	initArray(&a, 5);  // initially 5 elements
-	for (i = 0; i < 100; i++)
-	insertArray(&a, i);  // automatically resizes as necessary
-				
+	initArray(&a, 5);  // Initially 5 elements
+	for (i = 0; i < 100; i++) {
+		insertArray(&a, i);  // Automatically resizes as necessary
+	}
+	
 	int count = a.size;
-	for (i = 0; i < count; i++)
-	a.array[i] = i;
+	for (i = 0; i < count; i++) {
+		a.array[i] = i;
+	}
 				
-	//a.array[9]  // get and set byte to array element
-	//a.used  // number of elements
+	//a.array[9]  // Get and set byte to array element
+	//a.used  // Number of elements
 	freeArray(&a);
 }
 
@@ -172,11 +187,16 @@ int main(void) {
 	DDRB = 0xFF; //PORTB as Output
 	
 	byte input[FRAME_SIZE] = { 0 };
+	
 	USART_Init();       
 	
 	while(1) {
+		// Init Array
+		Array inputArray;
+		initArray(&inputArray, 1000);
+		
 		// Get request
-		USART_Receive_Str(input);
+		USART_Receive_Str(input, &inputArray);
 		
 		// Get CRC8 byte index
 		byte index_crc8 = GetCRC8Index(input, FRAME_SIZE, CHR_COLON);
@@ -188,10 +208,10 @@ int main(void) {
 		if (input[index_crc8] == crc8) {
 			
 			// Info Blink
-			blink();
-			
+			//blink();
+						
 			// TEST TEMP FUNC
-			Testfunc();
+			//Testfunc();
 			
 			/*
 			// Send response
@@ -212,12 +232,16 @@ int main(void) {
 			
 			// Send response ( ECHO )
 			USART_Transmit_Str(input);
-			USART_Transmit_Str(CHR_COLON);
+			//USART_Transmit_Str(CHR_COLON);
 			USART_Transmit_Str(CHR_CARRET_RETURN);
-			USART_Transmit_Str(CHR_LINE_FEED);
+			//USART_Transmit_Str(CHR_LINE_FEED);
+			
+			// Info Blink
+			//blinkDebig();
+			
 		} else /* ERROR */ {
 			// Info Blink
-			blink();
+			//blink();
 	
 			byte answer[FRAME_SIZE] = { 0 };
 			answer[0] = CHR_COLON;
@@ -239,8 +263,17 @@ int main(void) {
 			USART_Transmit_Str(CHR_LINE_FEED);
 		}
 		
-		// Clean array
+		// Clear array
 		Clean_Data(input);
+		
+		// Free Array
+		freeArray(&inputArray);	
+		
+		// Info Blink
+		blink();
+		
+		// Info Blink
+		//blinkDebig();
 	}
 	
 	return 0;

@@ -142,7 +142,7 @@ namespace ClientAppNameSpace
                     {
                         string time = DateTime.Now.ToString("dd/MM/yy HH:mm:ss fff");
                         //string message = $"[{index.ToString("000000000")}] : ==> '{temp_src_msg}' and '{temp_res_msg}'";
-                        string message = $" => '{temp_transmit_msg}' AND '{temp_res_msg}'";
+                        string message = $" => '{temp_transmit_msg}'  AND  '{temp_res_msg}'";
 
                         // Init Error True!
                         bool is_error = false;

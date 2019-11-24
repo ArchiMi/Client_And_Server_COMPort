@@ -113,13 +113,19 @@ namespace ClientAppNameSpace.Src
             //for (int i = 0; i < Const.FRAME_LENGTH; i++)
             foreach (string item in msg)
             {
-                char ch = (char)byte.Parse(item);
-                if (i > 1 && ch == '\n')
+                if (item.Length > 0) {
+                    char ch = (char)byte.Parse(item);
+                    if (i > 1 && ch == '\n')
+                    {
+                        int previous_index = i - 1;
+                        char ch_prev = (char)byte.Parse(msg[previous_index]);
+                        if (ch_prev == '\r')
+                            return i - 3;
+                    }
+                }
+                else
                 {
-                    int previous_index = i - 1;
-                    char ch_prev = (char)byte.Parse(msg[previous_index]);
-                    if (ch_prev == '\r')
-                        return i - 3;
+
                 }
 
                 i++;
@@ -161,8 +167,9 @@ namespace ClientAppNameSpace.Src
         public string ReadBytes()
         {
             try
-            { 
+            {
                 char[] result = new char[Const.FRAME_LENGTH];
+                //List<char> result = new List<char>();
                 byte[] result_byte = new byte[Const.FRAME_LENGTH];
                 try
                 {
@@ -178,9 +185,17 @@ namespace ClientAppNameSpace.Src
                             result_byte[i] = (byte)x;
 
                             if (i > 0)
-                                if (result[i-1] == '\n')
-                                    if (result[i-2] == '\r')
+                            {
+                                byte t1 = (byte)result[i - 1];
+                                if (result[i - 1] == '\n')
+                                {
+                                    byte t2 = (byte)result[i - 2];
+                                    if (result[i - 2] == '\r')
+                                    {
                                         break;
+                                    }
+                                }
+                            }
 
                             i++;
                         }
@@ -229,6 +244,8 @@ namespace ClientAppNameSpace.Src
                 if (this._serial_port.IsOpen)
                     this._serial_port.Close();
         }
+
+
 
         #region COM_PORT_RECEIVED
 

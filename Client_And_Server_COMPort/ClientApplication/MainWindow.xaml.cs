@@ -78,7 +78,7 @@ namespace ClientAppNameSpace
                 //TEST
                 Random rand = new Random();
 
-                for (int i = 0; i < 100000; i++)
+                for (int i = 0; i < 1000000; i++)
                 {
                     /*
                     char[] msg = new char[Const.FRAME_LENGTH];

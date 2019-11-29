@@ -39,18 +39,16 @@ void freeArray(Array* a) {
 	a->used = a->size = 0;
 }
 
-
-
 void USART_Init() {
 	sei();
 	
 	//BEGIN Test	
 	wdt_disable();
 	
-	bool WD_RST = MCUSR & 0x08;
-	bool BO_RST = MCUSR & 0x04;
-	bool EXT_RST = MCUSR & 0x02;
-	bool PON_RST = MCUSR & 0x01;
+	//bool WD_RST = MCUSR & 0x08;
+	//bool BO_RST = MCUSR & 0x04;
+	//bool EXT_RST = MCUSR & 0x02;
+	//bool PON_RST = MCUSR & 0x01;
 	MCUSR = MCUSR & 0xF0;
 	//END Test
 		
@@ -65,7 +63,7 @@ void USART_Init() {
 	UBRR0L = BAUD_PRESCALE;
 	UBRR0H = BAUD_PRESCALE >> 8;
 
-	// Не менее 20 милисекунд
+	// Не менее 20 милисекунд соглано документации
 	_delay_ms(20);
 }
 
@@ -117,8 +115,9 @@ void USART_Send(byte data) {
 }
 
 // ERROR ERROR ... called string may be one char, but FRAME_SIZE 32 chars
-void USART_Transmit_Str(byte *calledstring) {
+void USART_Transmit_Str(byte *calledstring, Array* a) {
 	// Chars array
+	/*
 	for (int i = 0; i <= FRAME_SIZE; i++) {
 		if (calledstring[i] != 0)
 			// Send char
@@ -126,27 +125,35 @@ void USART_Transmit_Str(byte *calledstring) {
 		else 
 			break;		
 	}
+	*/
+	
+	//Array
+	int count = a->size;
+	for (int i = 0; i < count; i++) {		
+		if (a->array[i] != 0)
+			// Send char
+			USART_Send(a->array[i]);
+		else
+			break;
+	}
 }
 
 void blink_WD() {
 	PORTB |= ( 1 << PINB4 ); //0xFF; //On
 	_delay_ms(1);
 	PORTB &= ~( 1 << PINB4 ); //0x00; //OFF
-	_delay_ms(1);
 }
 
 void blink() {
 	PORTB |= ( 1 << PINB5 ); //0xFF; //On
-	_delay_ms(5);
+	_delay_ms(1);
 	PORTB &= ~( 1 << PINB5 ); //0x00; //OFF
-	_delay_ms(5);
 }
 
 void blinkDebig() {
 	PORTB |= ( 1 << PINB6 ); //0xFF; //On
-	_delay_ms(5);
+	_delay_ms(1);
 	PORTB &= ~( 1 << PINB6 ); //0x00; //OFF
-	_delay_ms(5);
 }
 
 void Clean_Data(byte *input_data) {
@@ -231,9 +238,9 @@ int main(void) {
 			*/
 			
 			// Send response ( ECHO )
-			USART_Transmit_Str(input);
+			USART_Transmit_Str(input, &inputArray);
 			//USART_Transmit_Str(CHR_COLON);
-			USART_Transmit_Str(CHR_CARRET_RETURN);
+			USART_Transmit_Str(CHR_CARRET_RETURN, &inputArray);
 			//USART_Transmit_Str(CHR_LINE_FEED);
 			
 			// Info Blink
@@ -256,11 +263,11 @@ int main(void) {
 			answer[9] = CHR_LINE_FEED;
 			
 			// Send response
-			USART_Transmit_Str(answer);
+			USART_Transmit_Str(answer, &inputArray);
 			
 			// End answer message chars
-			USART_Transmit_Str(CHR_CARRET_RETURN);
-			USART_Transmit_Str(CHR_LINE_FEED);
+			USART_Transmit_Str(CHR_CARRET_RETURN, &inputArray);
+			USART_Transmit_Str(CHR_LINE_FEED, &inputArray);
 		}
 		
 		// Clear array

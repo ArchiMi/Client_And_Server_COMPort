@@ -4,3 +4,11 @@
 *bin/
 *Logs/
 *sessionn_num.log
+**/bin/
+**/Logs/
+**/sessionn_num.log
+**bin/
+**Logs/
+**sessionn_num.log
+Logs
+*.log

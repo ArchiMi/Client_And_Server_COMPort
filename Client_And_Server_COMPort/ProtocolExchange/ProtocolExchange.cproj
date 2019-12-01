@@ -148,6 +148,12 @@
     <Compile Include="Src\crc8.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="Src\dynamic_array.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Src\dynamic_array.h">
+      <SubType>compile</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Src" />

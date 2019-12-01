@@ -7,6 +7,8 @@
 
 typedef unsigned char byte;
 
+#define NULL ((void*)0)
+
 // In table 'Examples of UBRRn Settings' for ATmega328P U2X=1 "7 - 256000 Baud" or 207 - 9600
 //#define BAUD_PRESCALE 207 //207 - 9600 U2X=1
 #define BAUD_PRESCALE 3 //3 - 256000 U2X=0

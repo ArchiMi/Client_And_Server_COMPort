@@ -1,5 +1,5 @@
 #define F_CPU 16000000UL
-#define NULL ((void*)0)
+
 
 #include <avr/io.h>
 #include <util/delay.h>
@@ -9,35 +9,7 @@
 #include <stdbool.h>
 #include "Src/crc8.h"
 #include "Src/const.h"
-
-typedef struct {
-	byte* array;
-	int used;
-	int size;
-} Array;
-
-void initArray(Array* a, size_t initialSize) {
-	a->array = (byte*)malloc(initialSize * sizeof(byte));
-	a->used = 0;
-	a->size = initialSize;
-}
-
-void insertArray(Array* a, byte element_byte) {
-	if (a->used == a->size) {
-		a->size += 1;
-		byte* newarr = (byte*)realloc(a->array, a->size * sizeof(byte));
-		if (newarr == NULL) return; // Block don't selected - return 
-		a->array = newarr;
-	}
-
-	a->array[a->used++] = element_byte;
-}
-
-void freeArray(Array* a) {
-	free(a->array);
-	a->array = NULL;
-	a->used = a->size = 0;
-}
+#include "Src/dynamic_array.h"
 
 void USART_Init() {
 	sei();
@@ -114,8 +86,7 @@ void USART_Send(byte data) {
 	UDR0 = data;
 }
 
-// ERROR ERROR ... called string may be one char, but FRAME_SIZE 32 chars
-void USART_Transmit_Str(byte *calledstring, Array* a) {
+void USART_Transmit_Str(Array* a) {
 	// Chars array
 	/*
 	for (int i = 0; i <= FRAME_SIZE; i++) {
@@ -133,6 +104,7 @@ void USART_Transmit_Str(byte *calledstring, Array* a) {
 		if (a->array[i] != 0)
 			// Send char
 			USART_Send(a->array[i]);
+			//USART_Send(55);
 		else
 			break;
 	}
@@ -148,12 +120,6 @@ void blink() {
 	PORTB |= ( 1 << PINB5 ); //0xFF; //On
 	_delay_ms(1);
 	PORTB &= ~( 1 << PINB5 ); //0x00; //OFF
-}
-
-void blinkDebig() {
-	PORTB |= ( 1 << PINB6 ); //0xFF; //On
-	_delay_ms(1);
-	PORTB &= ~( 1 << PINB6 ); //0x00; //OFF
 }
 
 void Clean_Data(byte *input_data) {
@@ -200,7 +166,7 @@ int main(void) {
 	while(1) {
 		// Init Array
 		Array inputArray;
-		initArray(&inputArray, 1000);
+		initArray(&inputArray, 50);
 		
 		// Get request
 		USART_Receive_Str(input, &inputArray);
@@ -214,60 +180,56 @@ int main(void) {
 		
 		if (input[index_crc8] == crc8) {
 			
-			// Info Blink
-			//blink();
-						
-			// TEST TEMP FUNC
-			//Testfunc();
+			///i-60660
+			freeArray(&inputArray);	
+			initArray(&inputArray, 50);
 			
-			/*
-			// Send response
-			byte output[FRAME_SIZE] = { 0 };			
-			output[0] = CHR_COLON;
-			output[1] = 1;
-			output[2] = 2;
-			output[3] = 3;
-			output[4] = 4;
-			output[5] = 5;
-			output[6] = 6;
-			output[7] = CHR_COLON;
-			output[8] = CHR_CARRET_RETURN;
-			output[9] = CHR_LINE_FEED;
-			USART_Transmit_Str(output);
-			USART_Transmit_Str(CHR_CARRET_RETURN);
-			*/
+			insertArray(&inputArray, CHR_COLON);
+			insertArray(&inputArray, 55);
+			insertArray(&inputArray, 55);
+			insertArray(&inputArray, 55);
+			insertArray(&inputArray, 55);
+			insertArray(&inputArray, 55);
+			insertArray(&inputArray, 55);
+			insertArray(&inputArray, 55);
+			insertArray(&inputArray, 55);
+			insertArray(&inputArray, 55);
+			insertArray(&inputArray, 55);
+			insertArray(&inputArray, 55);
+			insertArray(&inputArray, 55);
+			insertArray(&inputArray, CHR_COLON);
+			insertArray(&inputArray, CHR_CARRET_RETURN);
+			insertArray(&inputArray, CHR_LINE_FEED);
 			
 			// Send response ( ECHO )
-			USART_Transmit_Str(input, &inputArray);
-			//USART_Transmit_Str(CHR_COLON);
-			USART_Transmit_Str(CHR_CARRET_RETURN, &inputArray);
-			//USART_Transmit_Str(CHR_LINE_FEED);
+			//USART_Transmit_Str(input, &inputArray);
+			USART_Transmit_Str(&inputArray);
 			
 			// Info Blink
-			//blinkDebig();
+			blink();
 			
-		} else /* ERROR */ {
-			// Info Blink
-			//blink();
-	
+		} else /* ERROR */ {	
 			byte answer[FRAME_SIZE] = { 0 };
 			answer[0] = CHR_COLON;
 			answer[1] = crc8;
 			answer[2] = input[index_crc8];
 			answer[3] = index_crc8;
-			answer[4] = "2";
-			answer[5] = "3";
-			answer[6] = "4";
+			answer[4] = 35;
+			answer[5] = 36;
+			answer[6] = 34;
 			answer[7] = CHR_COLON;
 			answer[8] = CHR_CARRET_RETURN;
 			answer[9] = CHR_LINE_FEED;
 			
 			// Send response
-			USART_Transmit_Str(answer, &inputArray);
+			//USART_Transmit_Str(answer, &inputArray);
+			USART_Transmit_Str(&inputArray);
 			
+			/*
 			// End answer message chars
 			USART_Transmit_Str(CHR_CARRET_RETURN, &inputArray);
 			USART_Transmit_Str(CHR_LINE_FEED, &inputArray);
+			*/
 		}
 		
 		// Clear array
@@ -277,10 +239,7 @@ int main(void) {
 		freeArray(&inputArray);	
 		
 		// Info Blink
-		blink();
-		
-		// Info Blink
-		//blinkDebig();
+		//blink();
 	}
 	
 	return 0;

@@ -6,3 +6,5 @@ main.c
 
 Src\crc8.c
 
+Src\dynamic_array.c
+

@@ -1,5 +1,7 @@
-Client And Server
 
+![stack Overflow](http://lmsotfy.com/so.png)
+
+Client And Server
 
 === Client (C# 'WPF' on Visual Studio IDE 2017) ===
 1) Установить последовательное соединение с сервером (atmega328p) Baud-256000, MHz-16000000UL (реализовано)

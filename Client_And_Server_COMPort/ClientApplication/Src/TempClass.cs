@@ -168,9 +168,7 @@ namespace ClientAppNameSpace.Src
         {
             try
             {
-                char[] result = new char[Const.FRAME_LENGTH];
-                //List<char> result = new List<char>();
-                byte[] result_byte = new byte[Const.FRAME_LENGTH];
+                List<char> result = new List<char>();
                 try
                 {
                     int i = 0;
@@ -181,15 +179,18 @@ namespace ClientAppNameSpace.Src
                         while (true)
                         {
                             x = this._serial_port.ReadByte();
-                            result[i] = (char)x;
-                            result_byte[i] = (byte)x;
+                            result.Add((char)x);
 
                             if (i > 0)
                             {
+#if DEBUG
                                 byte t1 = (byte)result[i - 1];
+#endif
                                 if (result[i - 1] == '\n')
                                 {
+#if DEBUG
                                     byte t2 = (byte)result[i - 2];
+#endif
                                     if (result[i - 2] == '\r')
                                     {
                                         break;

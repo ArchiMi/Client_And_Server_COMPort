@@ -19,7 +19,8 @@ namespace ClientAppNameSpace.Src
 
     public class Const
     {
-        public const int FRAME_LENGTH = 32;
+        //Old constant
+        //public const int FRAME_LENGTH = 32;
 
         //Frame standart ( Start(:) / Address / Function / Data / LRC Check / End(:) / 1 Char / 2 Chars / n Chars / CR / LF )
         public const Char CHR_COLON = ':';

@@ -180,7 +180,8 @@ int main(void) {
 		
 		if (input[index_crc8] == crc8) {
 			
-			///i-60660
+			/*
+			//Clear request data
 			freeArray(&inputArray);	
 			initArray(&inputArray, 50);
 			
@@ -200,6 +201,7 @@ int main(void) {
 			insertArray(&inputArray, CHR_COLON);
 			insertArray(&inputArray, CHR_CARRET_RETURN);
 			insertArray(&inputArray, CHR_LINE_FEED);
+			*/
 			
 			// Send response ( ECHO )
 			//USART_Transmit_Str(input, &inputArray);

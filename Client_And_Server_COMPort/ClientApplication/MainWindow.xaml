@@ -5,7 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ClientAppNameSpace"
         mc:Ignorable="d"
-        Title="Client Application" Height="644.906" Width="1203.889">
+        Title="Client Application" 
+        Height="644.906" 
+        Width="1203.889"
+        WindowState="Maximized"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>

@@ -13,21 +13,21 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY
   4 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  00000a2c  2**2
                   CONTENTS, READONLY
-  5 .debug_aranges 000000c8  00000000  00000000  00000a6c  2**0
+  5 .debug_aranges 000000c0  00000000  00000000  00000a6c  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_info   00001036  00000000  00000000  00000b34  2**0
+  6 .debug_info   00000f9d  00000000  00000000  00000b2c  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_abbrev 00000a07  00000000  00000000  00001b6a  2**0
+  7 .debug_abbrev 000009e0  00000000  00000000  00001ac9  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_line   00000812  00000000  00000000  00002571  2**0
+  8 .debug_line   000007bb  00000000  00000000  000024a9  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_frame  00000220  00000000  00000000  00002d84  2**2
+  9 .debug_frame  000001f8  00000000  00000000  00002c64  2**2
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    00000550  00000000  00000000  00002fa4  2**0
+ 10 .debug_str    00000547  00000000  00000000  00002e5c  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    0000090a  00000000  00000000  000034f4  2**0
+ 11 .debug_loc    0000086d  00000000  00000000  000033a3  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 000000b0  00000000  00000000  00003dfe  2**0
+ 12 .debug_ranges 000000a8  00000000  00000000  00003c10  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -101,13 +101,19 @@ Disassembly of section .text:
   a2:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
 
 000000a6 <USART_Init>:
-	}
-				
-	//a.array[9]  // Get and set byte to array element
-	//a.used  // Number of elements
-	freeArray(&a);
-}
+#include "Src/crc8.h"
+#include "Src/const.h"
+#include "Src/dynamic_array.h"
+
+void USART_Init() {
+	sei();
   a6:	78 94       	sei
+		);
+	}
+	else
+	{
+        uint8_t register temp_reg;
+		__asm__ __volatile__ (
   a8:	0f b6       	in	r0, 0x3f	; 63
   aa:	f8 94       	cli
   ac:	a8 95       	wdr
@@ -116,9 +122,21 @@ Disassembly of section .text:
   b4:	80 93 60 00 	sts	0x0060, r24	; 0x800060 <__TEXT_REGION_LENGTH__+0x7e0060>
   b8:	10 92 60 00 	sts	0x0060, r1	; 0x800060 <__TEXT_REGION_LENGTH__+0x7e0060>
   bc:	0f be       	out	0x3f, r0	; 63
+	
+	//bool WD_RST = MCUSR & 0x08;
+	//bool BO_RST = MCUSR & 0x04;
+	//bool EXT_RST = MCUSR & 0x02;
+	//bool PON_RST = MCUSR & 0x01;
+	MCUSR = MCUSR & 0xF0;
   be:	84 b7       	in	r24, 0x34	; 52
   c0:	80 7f       	andi	r24, 0xF0	; 240
   c2:	84 bf       	out	0x34, r24	; 52
+				: "r0"
+		);
+	}
+	else
+	{
+		__asm__ __volatile__ (
   c4:	88 e1       	ldi	r24, 0x18	; 24
   c6:	99 e2       	ldi	r25, 0x29	; 41
   c8:	0f b6       	in	r0, 0x3f	; 63
@@ -127,14 +145,32 @@ Disassembly of section .text:
   ce:	80 93 60 00 	sts	0x0060, r24	; 0x800060 <__TEXT_REGION_LENGTH__+0x7e0060>
   d2:	0f be       	out	0x3f, r0	; 63
   d4:	90 93 60 00 	sts	0x0060, r25	; 0x800060 <__TEXT_REGION_LENGTH__+0x7e0060>
+	//END Test
+		
+	wdt_enable(WDTO_8S);
+	
+	WDTCSR = 1<<WDIE;
   d8:	90 e4       	ldi	r25, 0x40	; 64
   da:	90 93 60 00 	sts	0x0060, r25	; 0x800060 <__TEXT_REGION_LENGTH__+0x7e0060>
+	
+	//UCSR0A |= (1<<U2X0); //Удвоение частоты
+	UCSR0B = (1<<RXEN0) | (1<<TXEN0); //Trust transmit and receive from USART - T/R ENable = True
   de:	80 93 c1 00 	sts	0x00C1, r24	; 0x8000c1 <__TEXT_REGION_LENGTH__+0x7e00c1>
+	UCSR0C = (0<<UMSEL01) | (0<<UMSEL00) | (1<<USBS0) | (1<<UCSZ00) | (1<<UCSZ01) | (1 << UCSZ00);
   e2:	8e e0       	ldi	r24, 0x0E	; 14
   e4:	80 93 c2 00 	sts	0x00C2, r24	; 0x8000c2 <__TEXT_REGION_LENGTH__+0x7e00c2>
+	
+	UBRR0L = BAUD_PRESCALE;
   e8:	83 e0       	ldi	r24, 0x03	; 3
   ea:	80 93 c4 00 	sts	0x00C4, r24	; 0x8000c4 <__TEXT_REGION_LENGTH__+0x7e00c4>
+	UBRR0H = BAUD_PRESCALE >> 8;
   ee:	10 92 c5 00 	sts	0x00C5, r1	; 0x8000c5 <__TEXT_REGION_LENGTH__+0x7e00c5>
+	#else
+		//round up by default
+		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+	#endif
+
+	__builtin_avr_delay_cycles(__ticks_dc);
   f2:	2f ef       	ldi	r18, 0xFF	; 255
   f4:	89 ef       	ldi	r24, 0xF9	; 249
   f6:	90 e0       	ldi	r25, 0x00	; 0
@@ -147,15 +183,25 @@ Disassembly of section .text:
  104:	08 95       	ret
 
 00000106 <USART_Receive>:
+	// Не менее 20 милисекунд соглано документации
+	_delay_ms(20);
+}
+
+byte USART_Receive(void) {	
+	while( !(UCSR0A & (1<<RXC0)) );
  106:	e0 ec       	ldi	r30, 0xC0	; 192
  108:	f0 e0       	ldi	r31, 0x00	; 0
  10a:	80 81       	ld	r24, Z
  10c:	88 23       	and	r24, r24
  10e:	ec f7       	brge	.-6      	; 0x10a <USART_Receive+0x4>
+	return UDR0;	
  110:	80 91 c6 00 	lds	r24, 0x00C6	; 0x8000c6 <__TEXT_REGION_LENGTH__+0x7e00c6>
+}
  114:	08 95       	ret
 
 00000116 <USART_Receive_Str>:
+
+void USART_Receive_Str(byte *calledstring, Array* a) {
  116:	df 92       	push	r13
  118:	ef 92       	push	r14
  11a:	ff 92       	push	r15
@@ -165,22 +211,45 @@ Disassembly of section .text:
  122:	df 93       	push	r29
  124:	8c 01       	movw	r16, r24
  126:	7b 01       	movw	r14, r22
+	char ch;
+	
+	int i = 0;	
  128:	c0 e0       	ldi	r28, 0x00	; 0
  12a:	d0 e0       	ldi	r29, 0x00	; 0
+ 				if (calledstring[previous_index] == CHR_CARRET_RETURN) {
+					calledstring[i] = CHR_LINE_FEED;
+					insertArray(a, CHR_LINE_FEED);
+					return;
+				} else {
+					calledstring[i] = ch;
  12c:	0f 2e       	mov	r0, r31
  12e:	fa e0       	ldi	r31, 0x0A	; 10
  130:	df 2e       	mov	r13, r31
  132:	f0 2d       	mov	r31, r0
+		if (i == FRAME_SIZE) {
+			return;
+		}		
+	
+		// Get input char	
+		ch = USART_Receive();
  134:	0e 94 83 00 	call	0x106	; 0x106 <USART_Receive>
+		
+		// Check first char equal COLON
+		if (ch != CHR_COLON && i == 0) {
  138:	8a 33       	cpi	r24, 0x3A	; 58
  13a:	01 f1       	breq	.+64     	; 0x17c <USART_Receive_Str+0x66>
  13c:	20 97       	sbiw	r28, 0x00	; 0
  13e:	d1 f3       	breq	.-12     	; 0x134 <USART_Receive_Str+0x1e>
+			continue;
+		} else {
+			if (ch == CHR_LINE_FEED && i > 0) {
  140:	8a 30       	cpi	r24, 0x0A	; 10
  142:	e1 f4       	brne	.+56     	; 0x17c <USART_Receive_Str+0x66>
  144:	1c 16       	cp	r1, r28
  146:	1d 06       	cpc	r1, r29
  148:	cc f4       	brge	.+50     	; 0x17c <USART_Receive_Str+0x66>
+				int previous_index = i - 1;
+ 				if (calledstring[previous_index] == CHR_CARRET_RETURN) {
  14a:	f8 01       	movw	r30, r16
  14c:	ec 0f       	add	r30, r28
  14e:	fd 1f       	adc	r31, r29
@@ -188,33 +257,68 @@ Disassembly of section .text:
  152:	80 81       	ld	r24, Z
  154:	8d 30       	cpi	r24, 0x0D	; 13
  156:	49 f4       	brne	.+18     	; 0x16a <USART_Receive_Str+0x54>
+					calledstring[i] = CHR_LINE_FEED;
  158:	c0 0f       	add	r28, r16
  15a:	d1 1f       	adc	r29, r17
  15c:	8a e0       	ldi	r24, 0x0A	; 10
  15e:	88 83       	st	Y, r24
+					insertArray(a, CHR_LINE_FEED);
  160:	6a e0       	ldi	r22, 0x0A	; 10
  162:	c7 01       	movw	r24, r14
  164:	0e 94 cf 01 	call	0x39e	; 0x39e <insertArray>
+					return;
  168:	15 c0       	rjmp	.+42     	; 0x194 <USART_Receive_Str+0x7e>
+				} else {
+					calledstring[i] = ch;
  16a:	f8 01       	movw	r30, r16
  16c:	ec 0f       	add	r30, r28
  16e:	fd 1f       	adc	r31, r29
  170:	d0 82       	st	Z, r13
+					insertArray(a, ch);
  172:	6d 2d       	mov	r22, r13
  174:	c7 01       	movw	r24, r14
  176:	0e 94 cf 01 	call	0x39e	; 0x39e <insertArray>
+		
+		// Check first char equal COLON
+		if (ch != CHR_COLON && i == 0) {
+			continue;
+		} else {
+			if (ch == CHR_LINE_FEED && i > 0) {
  17a:	08 c0       	rjmp	.+16     	; 0x18c <USART_Receive_Str+0x76>
+				} else {
+					calledstring[i] = ch;
+					insertArray(a, ch);
+				}
+			} else {
+				calledstring[i] = ch;
  17c:	f8 01       	movw	r30, r16
  17e:	ec 0f       	add	r30, r28
  180:	fd 1f       	adc	r31, r29
  182:	80 83       	st	Z, r24
+				insertArray(a, ch);
  184:	68 2f       	mov	r22, r24
  186:	c7 01       	movw	r24, r14
  188:	0e 94 cf 01 	call	0x39e	; 0x39e <insertArray>
+			}	
+		}
+		
+		i++;
  18c:	21 96       	adiw	r28, 0x01	; 1
+	char ch;
+	
+	int i = 0;	
+	while(1) {				
+		// Check error from receive 
+		if (i == FRAME_SIZE) {
  18e:	c0 32       	cpi	r28, 0x20	; 32
  190:	d1 05       	cpc	r29, r1
  192:	81 f6       	brne	.-96     	; 0x134 <USART_Receive_Str+0x1e>
+			}	
+		}
+		
+		i++;
+	}	
+}
  194:	df 91       	pop	r29
  196:	cf 91       	pop	r28
  198:	1f 91       	pop	r17
@@ -225,15 +329,22 @@ Disassembly of section .text:
  1a2:	08 95       	ret
 
 000001a4 <USART_Send>:
+
+void USART_Send(byte data) {
+	while( !(UCSR0A & ( 1 << UDRE0 )) );
  1a4:	e0 ec       	ldi	r30, 0xC0	; 192
  1a6:	f0 e0       	ldi	r31, 0x00	; 0
  1a8:	90 81       	ld	r25, Z
  1aa:	95 ff       	sbrs	r25, 5
  1ac:	fd cf       	rjmp	.-6      	; 0x1a8 <USART_Send+0x4>
+	UDR0 = data;
  1ae:	80 93 c6 00 	sts	0x00C6, r24	; 0x8000c6 <__TEXT_REGION_LENGTH__+0x7e00c6>
  1b2:	08 95       	ret
 
 000001b4 <USART_Transmit_Str>:
+}
+
+void USART_Transmit_Str(Array* a) {
  1b4:	ef 92       	push	r14
  1b6:	ff 92       	push	r15
  1b8:	0f 93       	push	r16
@@ -241,11 +352,19 @@ Disassembly of section .text:
  1bc:	cf 93       	push	r28
  1be:	df 93       	push	r29
  1c0:	fc 01       	movw	r30, r24
+			break;		
+	}
+	*/
+	
+	//Array
+	int count = a->size;
  1c2:	e4 80       	ldd	r14, Z+4	; 0x04
  1c4:	f5 80       	ldd	r15, Z+5	; 0x05
+	for (int i = 0; i < count; i++) {		
  1c6:	1e 14       	cp	r1, r14
  1c8:	1f 04       	cpc	r1, r15
  1ca:	c4 f4       	brge	.+48     	; 0x1fc <USART_Transmit_Str+0x48>
+		if (a->array[i] != 0)
  1cc:	a0 81       	ld	r26, Z
  1ce:	b1 81       	ldd	r27, Z+1	; 0x01
  1d0:	8c 91       	ld	r24, X
@@ -264,11 +383,25 @@ Disassembly of section .text:
  1ea:	8f 01       	movw	r16, r30
  1ec:	c0 e0       	ldi	r28, 0x00	; 0
  1ee:	d0 e0       	ldi	r29, 0x00	; 0
+			// Send char
+			USART_Send(a->array[i]);
  1f0:	0e 94 d2 00 	call	0x1a4	; 0x1a4 <USART_Send>
+	}
+	*/
+	
+	//Array
+	int count = a->size;
+	for (int i = 0; i < count; i++) {		
  1f4:	21 96       	adiw	r28, 0x01	; 1
  1f6:	ec 16       	cp	r14, r28
  1f8:	fd 06       	cpc	r15, r29
  1fa:	71 f7       	brne	.-36     	; 0x1d8 <USART_Transmit_Str+0x24>
+			USART_Send(a->array[i]);
+			//USART_Send(55);
+		else
+			break;
+	}
+}
  1fc:	df 91       	pop	r29
  1fe:	cf 91       	pop	r28
  200:	1f 91       	pop	r17
@@ -278,6 +411,9 @@ Disassembly of section .text:
  208:	08 95       	ret
 
 0000020a <blink_WD>:
+
+void blink_WD() {
+	PORTB |= ( 1 << PINB4 ); //0xFF; //On
  20a:	2c 9a       	sbi	0x05, 4	; 5
  20c:	8f e9       	ldi	r24, 0x9F	; 159
  20e:	9f e0       	ldi	r25, 0x0F	; 15
@@ -285,10 +421,16 @@ Disassembly of section .text:
  212:	f1 f7       	brne	.-4      	; 0x210 <blink_WD+0x6>
  214:	00 c0       	rjmp	.+0      	; 0x216 <blink_WD+0xc>
  216:	00 00       	nop
+	_delay_ms(1);
+	PORTB &= ~( 1 << PINB4 ); //0x00; //OFF
  218:	2c 98       	cbi	0x05, 4	; 5
  21a:	08 95       	ret
 
 0000021c <blink>:
+}
+
+void blink() {
+	PORTB |= ( 1 << PINB5 ); //0xFF; //On
  21c:	2d 9a       	sbi	0x05, 5	; 5
  21e:	8f e9       	ldi	r24, 0x9F	; 159
  220:	9f e0       	ldi	r25, 0x0F	; 15
@@ -296,19 +438,38 @@ Disassembly of section .text:
  224:	f1 f7       	brne	.-4      	; 0x222 <blink+0x6>
  226:	00 c0       	rjmp	.+0      	; 0x228 <blink+0xc>
  228:	00 00       	nop
+	_delay_ms(1);
+	PORTB &= ~( 1 << PINB5 ); //0x00; //OFF
  22a:	2d 98       	cbi	0x05, 5	; 5
  22c:	08 95       	ret
 
 0000022e <Clean_Data>:
+}
+
+void Clean_Data(byte *input_data) {
  22e:	fc 01       	movw	r30, r24
  230:	80 96       	adiw	r24, 0x20	; 32
+	for (uint8_t i = 0; i < FRAME_SIZE; i++) {
+		input_data[i] = 0;
  232:	11 92       	st	Z+, r1
+	_delay_ms(1);
+	PORTB &= ~( 1 << PINB5 ); //0x00; //OFF
+}
+
+void Clean_Data(byte *input_data) {
+	for (uint8_t i = 0; i < FRAME_SIZE; i++) {
  234:	e8 17       	cp	r30, r24
  236:	f9 07       	cpc	r31, r25
  238:	e1 f7       	brne	.-8      	; 0x232 <Clean_Data+0x4>
+		input_data[i] = 0;
+	}
+}
  23a:	08 95       	ret
 
 0000023c <__vector_6>:
+
+// Watch dog
+ISR(WDT_vect) {
  23c:	1f 92       	push	r1
  23e:	0f 92       	push	r0
  240:	0f b6       	in	r0, 0x3f	; 63
@@ -326,9 +487,15 @@ Disassembly of section .text:
  258:	bf 93       	push	r27
  25a:	ef 93       	push	r30
  25c:	ff 93       	push	r31
+	wdt_reset();
  25e:	a8 95       	wdr
+
+	USART_Init();
  260:	0e 94 53 00 	call	0xa6	; 0xa6 <USART_Init>
+	
+	blink_WD();
  264:	0e 94 05 01 	call	0x20a	; 0x20a <blink_WD>
+}
  268:	ff 91       	pop	r31
  26a:	ef 91       	pop	r30
  26c:	bf 91       	pop	r27

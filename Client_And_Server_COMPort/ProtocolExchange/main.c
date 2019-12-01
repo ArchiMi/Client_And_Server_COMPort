@@ -137,25 +137,6 @@ ISR(WDT_vect) {
 	blink_WD();
 }
 
-void Testfunc() {
-	Array a;
-	int i;
-				
-	initArray(&a, 5);  // Initially 5 elements
-	for (i = 0; i < 100; i++) {
-		insertArray(&a, i);  // Automatically resizes as necessary
-	}
-	
-	int count = a.size;
-	for (i = 0; i < count; i++) {
-		a.array[i] = i;
-	}
-				
-	//a.array[9]  // Get and set byte to array element
-	//a.used  // Number of elements
-	freeArray(&a);
-}
-
 int main(void) {
 	DDRB = 0xFF; //PORTB as Output
 	

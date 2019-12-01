@@ -3,7 +3,29 @@
  *
  * Created: 30.11.2019 17:10:24
  *  Author: Developer
- */ 
+ */
+
+/*	
+	USED:
+ 
+	Array a;
+	int i;
+	 
+	initArray(&a, 5);  // Initially 5 elements
+	for (i = 0; i < 100; i++) {
+		insertArray(&a, i);  // Automatically resizes as necessary
+	}
+	 
+	int count = a.size;
+	for (i = 0; i < count; i++) {
+		a.array[i] = i;
+	}
+	 
+	//a.array[9]  // Get and set byte to array element
+	//a.used  // Number of elements
+	freeArray(&a);
+ */
+ 
 
 #include "const.h"
 #include <avr/pgmspace.h>

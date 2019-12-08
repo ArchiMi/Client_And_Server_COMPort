@@ -548,12 +548,12 @@ END GROUP
  .debug_abbrev  0x000007fb       0xcd Src/crc8.o
  .debug_abbrev  0x000008c8      0x118 Src/dynamic_array.o
 
-.debug_line     0x00000000      0x7bb
+.debug_line     0x00000000      0x7eb
  *(.debug_line .debug_line.* .debug_line_end)
  .debug_line    0x00000000      0x133 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.2.209/gcc/dev/atmega328p/avr5/crtatmega328p.o
- .debug_line    0x00000133      0x419 main.o
- .debug_line    0x0000054c      0x128 Src/crc8.o
- .debug_line    0x00000674      0x147 Src/dynamic_array.o
+ .debug_line    0x00000133      0x431 main.o
+ .debug_line    0x00000564      0x128 Src/crc8.o
+ .debug_line    0x0000068c      0x15f Src/dynamic_array.o
 
 .debug_frame    0x00000000      0x1f8
  *(.debug_frame)

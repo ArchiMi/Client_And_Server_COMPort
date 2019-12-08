@@ -1,5 +1,5 @@
 Src/dynamic_array.d Src/dynamic_array.o: ../Src/dynamic_array.c \
- ../Src/const.h \
+ ../Src/const.h ../Src/dynamic_array_type.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\pgmspace.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\inttypes.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\lib\gcc\avr\5.4.0\include\stdint.h \
@@ -15,6 +15,8 @@ Src/dynamic_array.d Src/dynamic_array.o: ../Src/dynamic_array.c \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\lock.h
 
 ../Src/const.h:
+
+../Src/dynamic_array_type.h:
 
 c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\pgmspace.h:
 

@@ -28,13 +28,8 @@
  
 
 #include "const.h"
+#include "dynamic_array_type.h"
 #include <avr/pgmspace.h>
-
-typedef struct {
-	byte* array;
-	int used;
-	int size;
-} Array;
 
 void initArray(Array* a, size_t initialSize) {
 	a->array = (byte*)malloc(initialSize * sizeof(byte));

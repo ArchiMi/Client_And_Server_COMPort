@@ -1,15 +1,13 @@
 #define F_CPU 16000000UL
 
-
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/pgmspace.h>
 #include <avr/wdt.h>
 #include <avr/interrupt.h>
 #include <stdbool.h>
-#include "Src/crc8.h"
 #include "Src/const.h"
-#include "Src/dynamic_array.h"
+#include "Src/utils.h"
 
 void USART_Init() {
 	sei();
@@ -35,7 +33,7 @@ void USART_Init() {
 	UBRR0L = BAUD_PRESCALE;
 	UBRR0H = BAUD_PRESCALE >> 8;
 
-	// Ќе менее 20 милисекунд соглано документации
+	// Ќе менее 20 миллисекунд согласно документации
 	_delay_ms(20);
 }
 
@@ -44,7 +42,7 @@ byte USART_Receive(void) {
 	return UDR0;	
 }
 
-void USART_Receive_Str(byte *calledstring, Array* a) {
+void USART_Receive_Str(byte *calledstring, DynamicArray* a) {
 	char ch;
 	
 	int i = 0;	
@@ -86,7 +84,7 @@ void USART_Send(byte data) {
 	UDR0 = data;
 }
 
-void USART_Transmit_Str(Array* a) {
+void USART_Transmit_Str(DynamicArray* a) {
 	// Chars array
 	/*
 	for (int i = 0; i <= FRAME_SIZE; i++) {
@@ -132,7 +130,7 @@ void Clean_Data(byte *input_data) {
 ISR(WDT_vect) {
 	wdt_reset();
 
-	USART_Init();
+	//USART_Init();
 	
 	blink_WD();
 }
@@ -146,20 +144,21 @@ int main(void) {
 	
 	while(1) {
 		// Init Array
-		Array inputArray;
+		DynamicArray inputArray;
 		initArray(&inputArray, 50);
 		
 		// Get request
 		USART_Receive_Str(input, &inputArray);
 		
 		// Get CRC8 byte index
-		byte index_crc8 = GetCRC8Index(input, FRAME_SIZE, CHR_COLON);
+		byte index_crc8 = getCRC8Index(input, /*&inputArray,*/ FRAME_SIZE);
+		//byte index_crc8_1 = GetCRC8Index1(input, FRAME_SIZE, CHR_COLON);
 			
 		// Add CRC8 byte
-		byte crc8 = Crc8(input, index_crc8);
-		//input[index_crc8] = crc8;
+		byte crc8_code = crc8(input, index_crc8);
+		//input[index_crc8] = crc8_code;
 		
-		if (input[index_crc8] == crc8) {
+		if (input[index_crc8] == crc8_code) {
 			
 			/*
 			//Clear request data
@@ -192,6 +191,7 @@ int main(void) {
 			blink();
 			
 		} else /* ERROR */ {	
+			/*
 			byte answer[FRAME_SIZE] = { 0 };
 			answer[0] = CHR_COLON;
 			answer[1] = crc8;
@@ -203,6 +203,7 @@ int main(void) {
 			answer[7] = CHR_COLON;
 			answer[8] = CHR_CARRET_RETURN;
 			answer[9] = CHR_LINE_FEED;
+			*/
 			
 			// Send response
 			//USART_Transmit_Str(answer, &inputArray);

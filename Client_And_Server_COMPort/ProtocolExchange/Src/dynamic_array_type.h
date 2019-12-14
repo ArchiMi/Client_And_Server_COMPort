@@ -11,4 +11,4 @@ typedef struct {
 	byte* array;
 	int used;
 	int size;
-} Array;
+} DynamicArray;

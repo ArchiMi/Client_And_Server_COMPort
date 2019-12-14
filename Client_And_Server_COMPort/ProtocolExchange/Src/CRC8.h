@@ -6,12 +6,5 @@
  */ 
 
 #include "const.h"
+//#include "dynamic_array_type.h"
 
-#ifndef CRC8_H_
-#define CRC8_H_
-
-
-#endif /* CRC8_H_ */
-
-uint8_t Crc8(uint8_t *pcBlock, uint8_t len);
-byte GetCRC8Index(byte *input_data, uint8_t frame_size, uint8_t end_line);

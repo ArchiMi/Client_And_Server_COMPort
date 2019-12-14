@@ -142,16 +142,10 @@
     <Compile Include="Src\const.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="Src\crc8.c">
+    <Compile Include="Src\utils.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="Src\crc8.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="Src\dynamic_array.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="Src\dynamic_array.h">
+    <Compile Include="Src\utils.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Src\dynamic_array_type.h">

@@ -66,19 +66,32 @@ const byte Crc8Table[] = {
 	0x3B, 0x0A, 0x59, 0x68, 0xFF, 0xCE, 0x9D, 0xAC
 };
 
-uint8_t crc8(uint8_t *pcBlock, uint8_t len) {
+/*
+uint8_t crc8(uint8_t *pcBlock, DynamicArray* a, uint8_t len) {
 	uint8_t crc = 0xFF;
 	for (int i = 0; i < len; i++) {
 		//crc = pgm_read_byte(&Crc8Table[crc ^ *pcBlock++]);
-		crc = Crc8Table[crc ^ *pcBlock++];
+		uint8_t temp = *pcBlock++;
+		uint8_t index = crc ^ temp;		
+		crc = Crc8Table[index];
+	}
+
+	return crc;
+}
+*/
+
+uint8_t crc8dy(DynamicArray* a, uint8_t len) {
+	uint8_t crc = 0xFF;
+	for (int i = 0; i < len; i++) {
+		uint8_t temp = a->array[i]; //*pcBlock++;
+		uint8_t index = crc ^ temp;
+		crc = Crc8Table[index];
 	}
 
 	return crc;
 }
 
-// frame_size = 32
-// end_line = 13
-byte getCRC8Index(byte *input_data, /*DynamicArray* a,*/ uint8_t frame_size) {
+byte getCRC8Index(byte *input_data, DynamicArray* a, uint8_t frame_size) {
 	uint8_t x = 0;
 	for (uint8_t i = 0; i < frame_size; i++) {
 		// Need many checks

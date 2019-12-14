@@ -106,6 +106,9 @@ void USART_Transmit_Str(DynamicArray* a) {
 		else
 			break;
 	}
+	
+	// Info Blink
+	blink();
 }
 
 void blink_WD() {
@@ -143,77 +146,50 @@ int main(void) {
 	USART_Init();       
 	
 	while(1) {
-		// Init Array
+		// Create array
 		DynamicArray inputArray;
-		initArray(&inputArray, 50);
+		initArray(&inputArray, 32);
 		
 		// Get request
 		USART_Receive_Str(input, &inputArray);
 		
 		// Get CRC8 byte index
-		byte index_crc8 = getCRC8Index(input, /*&inputArray,*/ FRAME_SIZE);
-		//byte index_crc8_1 = GetCRC8Index1(input, FRAME_SIZE, CHR_COLON);
+		byte index_crc8 = getCRC8Index(input, &inputArray, FRAME_SIZE);
 			
 		// Add CRC8 byte
-		byte crc8_code = crc8(input, index_crc8);
+		byte crc8_code = crc8dy(&inputArray, index_crc8);
 		//input[index_crc8] = crc8_code;
 		
-		if (input[index_crc8] == crc8_code) {
-			
-			/*
+		if (inputArray.array[index_crc8] == crc8_code) {
+						
 			//Clear request data
 			freeArray(&inputArray);	
 			initArray(&inputArray, 50);
 			
 			insertArray(&inputArray, CHR_COLON);
-			insertArray(&inputArray, 55);
-			insertArray(&inputArray, 55);
-			insertArray(&inputArray, 55);
-			insertArray(&inputArray, 55);
-			insertArray(&inputArray, 55);
-			insertArray(&inputArray, 55);
-			insertArray(&inputArray, 55);
-			insertArray(&inputArray, 55);
-			insertArray(&inputArray, 55);
-			insertArray(&inputArray, 55);
-			insertArray(&inputArray, 55);
-			insertArray(&inputArray, 55);
+			insertArray(&inputArray, 1);
+			insertArray(&inputArray, 2);
+			insertArray(&inputArray, 3);
+			insertArray(&inputArray, crc8_code);
 			insertArray(&inputArray, CHR_COLON);
 			insertArray(&inputArray, CHR_CARRET_RETURN);
 			insertArray(&inputArray, CHR_LINE_FEED);
-			*/
 			
 			// Send response ( ECHO )
-			//USART_Transmit_Str(input, &inputArray);
-			USART_Transmit_Str(&inputArray);
+			USART_Transmit_Str(&inputArray);			
+		} else /* ERROR */ {
+						
+			freeArray(&inputArray);	
+			initArray(&inputArray, 32);
 			
-			// Info Blink
-			blink();
-			
-		} else /* ERROR */ {	
-			/*
-			byte answer[FRAME_SIZE] = { 0 };
-			answer[0] = CHR_COLON;
-			answer[1] = crc8;
-			answer[2] = input[index_crc8];
-			answer[3] = index_crc8;
-			answer[4] = 35;
-			answer[5] = 36;
-			answer[6] = 34;
-			answer[7] = CHR_COLON;
-			answer[8] = CHR_CARRET_RETURN;
-			answer[9] = CHR_LINE_FEED;
-			*/
+			insertArray(&inputArray, CHR_COLON);
+			insertArray(&inputArray, crc8_code);			
+			insertArray(&inputArray, CHR_COLON);
+			insertArray(&inputArray, CHR_CARRET_RETURN);
+			insertArray(&inputArray, CHR_LINE_FEED);
 			
 			// Send response
-			//USART_Transmit_Str(answer, &inputArray);
 			USART_Transmit_Str(&inputArray);
-			
-			/*
-			// End answer message chars
-			USART_Transmit_Str(CHR_CARRET_RETURN, &inputArray);
-			USART_Transmit_Str(CHR_LINE_FEED, &inputArray);
-			*/
 		}
 		
 		// Clear array

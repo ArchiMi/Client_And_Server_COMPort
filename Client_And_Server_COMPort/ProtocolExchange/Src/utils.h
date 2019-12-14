@@ -16,8 +16,9 @@
 
 extern const byte Crc8Table[];
 
-uint8_t crc8(uint8_t *pcBlock, uint8_t len);
-byte getCRC8Index(byte *input_data, uint8_t frame_size);
+uint8_t crc8(uint8_t *pcBlock, DynamicArray* a, uint8_t len);
+uint8_t crc8dy(DynamicArray* a, uint8_t len);
+byte getCRC8Index(byte *input_data, DynamicArray* a, uint8_t frame_size);
 
 void initArray(DynamicArray* a, size_t initialSize);
 void insertArray(DynamicArray* a, byte element_byte);

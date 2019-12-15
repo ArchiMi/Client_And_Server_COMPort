@@ -29,7 +29,12 @@
 
 #include "const.h"
 #include "dynamic_array_type.h"
+#include <avr/io.h>
+#include <util/delay.h>
 #include <avr/pgmspace.h>
+#include <avr/wdt.h>
+#include <avr/interrupt.h>
+#include <stdbool.h>
 
 const byte Crc8Table[] = {
 	0x81, 0x31, 0x62, 0x53, 0xC4, 0xF5, 0xA6, 0x97,
@@ -128,4 +133,16 @@ void freeArray(DynamicArray* a) {
 	free(a->array);
 	a->array = NULL;
 	a->used = a->size = 0;
+}
+
+void blink_WD() {
+	PORTB |= ( 1 << PINB4 ); //0xFF; //On
+	_delay_ms(1);
+	PORTB &= ~( 1 << PINB4 ); //0x00; //OFF
+}
+
+void blink() {
+	PORTB |= ( 1 << PINB5 ); //0xFF; //On
+	_delay_ms(1);
+	PORTB &= ~( 1 << PINB5 ); //0x00; //OFF
 }

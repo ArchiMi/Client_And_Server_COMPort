@@ -15,19 +15,19 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY
   5 .debug_aranges 000000a8  00000000  00000000  00000b1c  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_info   00001158  00000000  00000000  00000bc4  2**0
+  6 .debug_info   000011aa  00000000  00000000  00000bc4  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_abbrev 0000099e  00000000  00000000  00001d1c  2**0
+  7 .debug_abbrev 000009fb  00000000  00000000  00001d6e  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_line   00000805  00000000  00000000  000026ba  2**0
+  8 .debug_line   00000868  00000000  00000000  00002769  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_frame  000001e4  00000000  00000000  00002ec0  2**2
+  9 .debug_frame  000001e4  00000000  00000000  00002fd4  2**2
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    00000540  00000000  00000000  000030a4  2**0
+ 10 .debug_str    00000540  00000000  00000000  000031b8  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    000007e9  00000000  00000000  000035e4  2**0
+ 11 .debug_loc    000007e9  00000000  00000000  000036f8  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 000000a0  00000000  00000000  00003dcd  2**0
+ 12 .debug_ranges 000000a0  00000000  00000000  00003ee1  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -39,7 +39,7 @@ Disassembly of section .text:
    c:	0c 94 51 00 	jmp	0xa2	; 0xa2 <__bad_interrupt>
   10:	0c 94 51 00 	jmp	0xa2	; 0xa2 <__bad_interrupt>
   14:	0c 94 51 00 	jmp	0xa2	; 0xa2 <__bad_interrupt>
-  18:	0c 94 22 01 	jmp	0x244	; 0x244 <__vector_6>
+  18:	0c 94 10 01 	jmp	0x220	; 0x220 <__vector_6>
   1c:	0c 94 51 00 	jmp	0xa2	; 0xa2 <__bad_interrupt>
   20:	0c 94 51 00 	jmp	0xa2	; 0xa2 <__bad_interrupt>
   24:	0c 94 51 00 	jmp	0xa2	; 0xa2 <__bad_interrupt>
@@ -94,16 +94,16 @@ Disassembly of section .text:
   94:	aa 30       	cpi	r26, 0x0A	; 10
   96:	b2 07       	cpc	r27, r18
   98:	e1 f7       	brne	.-8      	; 0x92 <.do_clear_bss_loop>
-  9a:	0e 94 47 01 	call	0x28e	; 0x28e <main>
+  9a:	0e 94 35 01 	call	0x26a	; 0x26a <main>
   9e:	0c 94 87 04 	jmp	0x90e	; 0x90e <_exit>
 
 000000a2 <__bad_interrupt>:
   a2:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
 
 000000a6 <USART_Init>:
+#include <avr/interrupt.h>
 #include <stdbool.h>
-#include "Src/const.h"
-#include "Src/utils.h"
+
 
 void USART_Init() {
 	sei();
@@ -265,7 +265,7 @@ void USART_Receive_Str(byte *calledstring, DynamicArray* a) {
 					insertArray(a, CHR_LINE_FEED);
  160:	6a e0       	ldi	r22, 0x0A	; 10
  162:	c7 01       	movw	r24, r14
- 164:	0e 94 27 02 	call	0x44e	; 0x44e <insertArray>
+ 164:	0e 94 15 02 	call	0x42a	; 0x42a <insertArray>
 					return;
  168:	15 c0       	rjmp	.+42     	; 0x194 <USART_Receive_Str+0x7e>
 				} else {
@@ -277,7 +277,7 @@ void USART_Receive_Str(byte *calledstring, DynamicArray* a) {
 					insertArray(a, ch);
  172:	6d 2d       	mov	r22, r13
  174:	c7 01       	movw	r24, r14
- 176:	0e 94 27 02 	call	0x44e	; 0x44e <insertArray>
+ 176:	0e 94 15 02 	call	0x42a	; 0x42a <insertArray>
 		
 		// Check first char equal COLON
 		if (ch != CHR_COLON && i == 0) {
@@ -298,7 +298,7 @@ void USART_Receive_Str(byte *calledstring, DynamicArray* a) {
 				insertArray(a, ch);
  184:	68 2f       	mov	r22, r24
  186:	c7 01       	movw	r24, r14
- 188:	0e 94 27 02 	call	0x44e	; 0x44e <insertArray>
+ 188:	0e 94 15 02 	call	0x42a	; 0x42a <insertArray>
 			}	
 		}
 		
@@ -341,603 +341,593 @@ void USART_Send(byte data) {
  1ae:	80 93 c6 00 	sts	0x00C6, r24	; 0x8000c6 <__TEXT_REGION_LENGTH__+0x7e00c6>
  1b2:	08 95       	ret
 
-000001b4 <blink_WD>:
-	// Info Blink
-	blink();
-}
-
-void blink_WD() {
-	PORTB |= ( 1 << PINB4 ); //0xFF; //On
- 1b4:	2c 9a       	sbi	0x05, 4	; 5
- 1b6:	8f e9       	ldi	r24, 0x9F	; 159
- 1b8:	9f e0       	ldi	r25, 0x0F	; 15
- 1ba:	01 97       	sbiw	r24, 0x01	; 1
- 1bc:	f1 f7       	brne	.-4      	; 0x1ba <blink_WD+0x6>
- 1be:	00 c0       	rjmp	.+0      	; 0x1c0 <blink_WD+0xc>
- 1c0:	00 00       	nop
-	_delay_ms(1);
-	PORTB &= ~( 1 << PINB4 ); //0x00; //OFF
- 1c2:	2c 98       	cbi	0x05, 4	; 5
- 1c4:	08 95       	ret
-
-000001c6 <blink>:
-}
-
-void blink() {
-	PORTB |= ( 1 << PINB5 ); //0xFF; //On
- 1c6:	2d 9a       	sbi	0x05, 5	; 5
- 1c8:	8f e9       	ldi	r24, 0x9F	; 159
- 1ca:	9f e0       	ldi	r25, 0x0F	; 15
- 1cc:	01 97       	sbiw	r24, 0x01	; 1
- 1ce:	f1 f7       	brne	.-4      	; 0x1cc <blink+0x6>
- 1d0:	00 c0       	rjmp	.+0      	; 0x1d2 <blink+0xc>
- 1d2:	00 00       	nop
-	_delay_ms(1);
-	PORTB &= ~( 1 << PINB5 ); //0x00; //OFF
- 1d4:	2d 98       	cbi	0x05, 5	; 5
- 1d6:	08 95       	ret
-
-000001d8 <USART_Transmit_Str>:
-void USART_Send(byte data) {
-	while( !(UCSR0A & ( 1 << UDRE0 )) );
-	UDR0 = data;
+000001b4 <USART_Transmit_Str>:
 }
 
 void USART_Transmit_Str(DynamicArray* a) {
- 1d8:	ef 92       	push	r14
- 1da:	ff 92       	push	r15
- 1dc:	0f 93       	push	r16
- 1de:	1f 93       	push	r17
- 1e0:	cf 93       	push	r28
- 1e2:	df 93       	push	r29
- 1e4:	8c 01       	movw	r16, r24
+ 1b4:	ef 92       	push	r14
+ 1b6:	ff 92       	push	r15
+ 1b8:	0f 93       	push	r16
+ 1ba:	1f 93       	push	r17
+ 1bc:	cf 93       	push	r28
+ 1be:	df 93       	push	r29
+ 1c0:	8c 01       	movw	r16, r24
 			break;		
 	}
 	*/
 	
 	//Array
 	int count = a->size;
- 1e6:	dc 01       	movw	r26, r24
- 1e8:	14 96       	adiw	r26, 0x04	; 4
- 1ea:	ed 90       	ld	r14, X+
- 1ec:	fc 90       	ld	r15, X
- 1ee:	15 97       	sbiw	r26, 0x05	; 5
+ 1c2:	dc 01       	movw	r26, r24
+ 1c4:	14 96       	adiw	r26, 0x04	; 4
+ 1c6:	ed 90       	ld	r14, X+
+ 1c8:	fc 90       	ld	r15, X
+ 1ca:	15 97       	sbiw	r26, 0x05	; 5
 	for (int i = 0; i < count; i++) {		
- 1f0:	1e 14       	cp	r1, r14
- 1f2:	1f 04       	cpc	r1, r15
- 1f4:	bc f4       	brge	.+46     	; 0x224 <USART_Transmit_Str+0x4c>
+ 1cc:	1e 14       	cp	r1, r14
+ 1ce:	1f 04       	cpc	r1, r15
+ 1d0:	bc f4       	brge	.+46     	; 0x200 <USART_Transmit_Str+0x4c>
 		if (a->array[i] != 0)
- 1f6:	ed 91       	ld	r30, X+
- 1f8:	fc 91       	ld	r31, X
- 1fa:	80 81       	ld	r24, Z
- 1fc:	81 11       	cpse	r24, r1
- 1fe:	0a c0       	rjmp	.+20     	; 0x214 <USART_Transmit_Str+0x3c>
- 200:	11 c0       	rjmp	.+34     	; 0x224 <USART_Transmit_Str+0x4c>
- 202:	d8 01       	movw	r26, r16
- 204:	ed 91       	ld	r30, X+
- 206:	fc 91       	ld	r31, X
- 208:	ec 0f       	add	r30, r28
- 20a:	fd 1f       	adc	r31, r29
- 20c:	80 81       	ld	r24, Z
- 20e:	81 11       	cpse	r24, r1
- 210:	03 c0       	rjmp	.+6      	; 0x218 <USART_Transmit_Str+0x40>
- 212:	08 c0       	rjmp	.+16     	; 0x224 <USART_Transmit_Str+0x4c>
- 214:	c0 e0       	ldi	r28, 0x00	; 0
- 216:	d0 e0       	ldi	r29, 0x00	; 0
+ 1d2:	ed 91       	ld	r30, X+
+ 1d4:	fc 91       	ld	r31, X
+ 1d6:	80 81       	ld	r24, Z
+ 1d8:	81 11       	cpse	r24, r1
+ 1da:	0a c0       	rjmp	.+20     	; 0x1f0 <USART_Transmit_Str+0x3c>
+ 1dc:	11 c0       	rjmp	.+34     	; 0x200 <USART_Transmit_Str+0x4c>
+ 1de:	d8 01       	movw	r26, r16
+ 1e0:	ed 91       	ld	r30, X+
+ 1e2:	fc 91       	ld	r31, X
+ 1e4:	ec 0f       	add	r30, r28
+ 1e6:	fd 1f       	adc	r31, r29
+ 1e8:	80 81       	ld	r24, Z
+ 1ea:	81 11       	cpse	r24, r1
+ 1ec:	03 c0       	rjmp	.+6      	; 0x1f4 <USART_Transmit_Str+0x40>
+ 1ee:	08 c0       	rjmp	.+16     	; 0x200 <USART_Transmit_Str+0x4c>
+ 1f0:	c0 e0       	ldi	r28, 0x00	; 0
+ 1f2:	d0 e0       	ldi	r29, 0x00	; 0
 			// Send char
 			USART_Send(a->array[i]);
- 218:	0e 94 d2 00 	call	0x1a4	; 0x1a4 <USART_Send>
+ 1f4:	0e 94 d2 00 	call	0x1a4	; 0x1a4 <USART_Send>
 	}
 	*/
 	
 	//Array
 	int count = a->size;
 	for (int i = 0; i < count; i++) {		
- 21c:	21 96       	adiw	r28, 0x01	; 1
- 21e:	ec 16       	cp	r14, r28
- 220:	fd 06       	cpc	r15, r29
- 222:	79 f7       	brne	.-34     	; 0x202 <USART_Transmit_Str+0x2a>
+ 1f8:	21 96       	adiw	r28, 0x01	; 1
+ 1fa:	ec 16       	cp	r14, r28
+ 1fc:	fd 06       	cpc	r15, r29
+ 1fe:	79 f7       	brne	.-34     	; 0x1de <USART_Transmit_Str+0x2a>
 		else
 			break;
 	}
 	
 	// Info Blink
 	blink();
- 224:	0e 94 e3 00 	call	0x1c6	; 0x1c6 <blink>
+ 200:	0e 94 57 02 	call	0x4ae	; 0x4ae <blink>
 }
- 228:	df 91       	pop	r29
- 22a:	cf 91       	pop	r28
- 22c:	1f 91       	pop	r17
- 22e:	0f 91       	pop	r16
- 230:	ff 90       	pop	r15
- 232:	ef 90       	pop	r14
- 234:	08 95       	ret
+ 204:	df 91       	pop	r29
+ 206:	cf 91       	pop	r28
+ 208:	1f 91       	pop	r17
+ 20a:	0f 91       	pop	r16
+ 20c:	ff 90       	pop	r15
+ 20e:	ef 90       	pop	r14
+ 210:	08 95       	ret
 
-00000236 <Clean_Data>:
-	PORTB |= ( 1 << PINB5 ); //0xFF; //On
-	_delay_ms(1);
-	PORTB &= ~( 1 << PINB5 ); //0x00; //OFF
-}
+00000212 <Clean_Data>:
 
 void Clean_Data(byte *input_data) {
- 236:	fc 01       	movw	r30, r24
- 238:	80 96       	adiw	r24, 0x20	; 32
+ 212:	fc 01       	movw	r30, r24
+ 214:	80 96       	adiw	r24, 0x20	; 32
 	for (uint8_t i = 0; i < FRAME_SIZE; i++) {
 		input_data[i] = 0;
- 23a:	11 92       	st	Z+, r1
-	_delay_ms(1);
-	PORTB &= ~( 1 << PINB5 ); //0x00; //OFF
+ 216:	11 92       	st	Z+, r1
+	// Info Blink
+	blink();
 }
 
 void Clean_Data(byte *input_data) {
 	for (uint8_t i = 0; i < FRAME_SIZE; i++) {
- 23c:	e8 17       	cp	r30, r24
- 23e:	f9 07       	cpc	r31, r25
- 240:	e1 f7       	brne	.-8      	; 0x23a <Clean_Data+0x4>
+ 218:	e8 17       	cp	r30, r24
+ 21a:	f9 07       	cpc	r31, r25
+ 21c:	e1 f7       	brne	.-8      	; 0x216 <Clean_Data+0x4>
 		input_data[i] = 0;
 	}
 }
- 242:	08 95       	ret
+ 21e:	08 95       	ret
 
-00000244 <__vector_6>:
+00000220 <__vector_6>:
 
 // Watch dog
 ISR(WDT_vect) {
- 244:	1f 92       	push	r1
- 246:	0f 92       	push	r0
- 248:	0f b6       	in	r0, 0x3f	; 63
- 24a:	0f 92       	push	r0
- 24c:	11 24       	eor	r1, r1
- 24e:	2f 93       	push	r18
- 250:	3f 93       	push	r19
- 252:	4f 93       	push	r20
- 254:	5f 93       	push	r21
- 256:	6f 93       	push	r22
- 258:	7f 93       	push	r23
- 25a:	8f 93       	push	r24
- 25c:	9f 93       	push	r25
- 25e:	af 93       	push	r26
- 260:	bf 93       	push	r27
- 262:	ef 93       	push	r30
- 264:	ff 93       	push	r31
+ 220:	1f 92       	push	r1
+ 222:	0f 92       	push	r0
+ 224:	0f b6       	in	r0, 0x3f	; 63
+ 226:	0f 92       	push	r0
+ 228:	11 24       	eor	r1, r1
+ 22a:	2f 93       	push	r18
+ 22c:	3f 93       	push	r19
+ 22e:	4f 93       	push	r20
+ 230:	5f 93       	push	r21
+ 232:	6f 93       	push	r22
+ 234:	7f 93       	push	r23
+ 236:	8f 93       	push	r24
+ 238:	9f 93       	push	r25
+ 23a:	af 93       	push	r26
+ 23c:	bf 93       	push	r27
+ 23e:	ef 93       	push	r30
+ 240:	ff 93       	push	r31
 	wdt_reset();
- 266:	a8 95       	wdr
+ 242:	a8 95       	wdr
 
 	//USART_Init();
 	
 	blink_WD();
- 268:	0e 94 da 00 	call	0x1b4	; 0x1b4 <blink_WD>
+ 244:	0e 94 4e 02 	call	0x49c	; 0x49c <blink_WD>
 }
- 26c:	ff 91       	pop	r31
- 26e:	ef 91       	pop	r30
- 270:	bf 91       	pop	r27
- 272:	af 91       	pop	r26
- 274:	9f 91       	pop	r25
- 276:	8f 91       	pop	r24
- 278:	7f 91       	pop	r23
- 27a:	6f 91       	pop	r22
- 27c:	5f 91       	pop	r21
- 27e:	4f 91       	pop	r20
- 280:	3f 91       	pop	r19
- 282:	2f 91       	pop	r18
- 284:	0f 90       	pop	r0
- 286:	0f be       	out	0x3f, r0	; 63
- 288:	0f 90       	pop	r0
- 28a:	1f 90       	pop	r1
- 28c:	18 95       	reti
+ 248:	ff 91       	pop	r31
+ 24a:	ef 91       	pop	r30
+ 24c:	bf 91       	pop	r27
+ 24e:	af 91       	pop	r26
+ 250:	9f 91       	pop	r25
+ 252:	8f 91       	pop	r24
+ 254:	7f 91       	pop	r23
+ 256:	6f 91       	pop	r22
+ 258:	5f 91       	pop	r21
+ 25a:	4f 91       	pop	r20
+ 25c:	3f 91       	pop	r19
+ 25e:	2f 91       	pop	r18
+ 260:	0f 90       	pop	r0
+ 262:	0f be       	out	0x3f, r0	; 63
+ 264:	0f 90       	pop	r0
+ 266:	1f 90       	pop	r1
+ 268:	18 95       	reti
 
-0000028e <main>:
+0000026a <main>:
 
 int main(void) {
- 28e:	cf 93       	push	r28
- 290:	df 93       	push	r29
- 292:	cd b7       	in	r28, 0x3d	; 61
- 294:	de b7       	in	r29, 0x3e	; 62
- 296:	a6 97       	sbiw	r28, 0x26	; 38
- 298:	0f b6       	in	r0, 0x3f	; 63
- 29a:	f8 94       	cli
- 29c:	de bf       	out	0x3e, r29	; 62
- 29e:	0f be       	out	0x3f, r0	; 63
- 2a0:	cd bf       	out	0x3d, r28	; 61
+ 26a:	cf 93       	push	r28
+ 26c:	df 93       	push	r29
+ 26e:	cd b7       	in	r28, 0x3d	; 61
+ 270:	de b7       	in	r29, 0x3e	; 62
+ 272:	a6 97       	sbiw	r28, 0x26	; 38
+ 274:	0f b6       	in	r0, 0x3f	; 63
+ 276:	f8 94       	cli
+ 278:	de bf       	out	0x3e, r29	; 62
+ 27a:	0f be       	out	0x3f, r0	; 63
+ 27c:	cd bf       	out	0x3d, r28	; 61
 	DDRB = 0xFF; //PORTB as Output
- 2a2:	8f ef       	ldi	r24, 0xFF	; 255
- 2a4:	84 b9       	out	0x04, r24	; 4
+ 27e:	8f ef       	ldi	r24, 0xFF	; 255
+ 280:	84 b9       	out	0x04, r24	; 4
 	
 	byte input[FRAME_SIZE] = { 0 };
- 2a6:	fe 01       	movw	r30, r28
- 2a8:	31 96       	adiw	r30, 0x01	; 1
- 2aa:	80 e2       	ldi	r24, 0x20	; 32
- 2ac:	df 01       	movw	r26, r30
- 2ae:	1d 92       	st	X+, r1
- 2b0:	8a 95       	dec	r24
- 2b2:	e9 f7       	brne	.-6      	; 0x2ae <main+0x20>
+ 282:	fe 01       	movw	r30, r28
+ 284:	31 96       	adiw	r30, 0x01	; 1
+ 286:	80 e2       	ldi	r24, 0x20	; 32
+ 288:	df 01       	movw	r26, r30
+ 28a:	1d 92       	st	X+, r1
+ 28c:	8a 95       	dec	r24
+ 28e:	e9 f7       	brne	.-6      	; 0x28a <main+0x20>
 	
 	USART_Init();       
- 2b4:	0e 94 53 00 	call	0xa6	; 0xa6 <USART_Init>
+ 290:	0e 94 53 00 	call	0xa6	; 0xa6 <USART_Init>
 	
 	while(1) {
 		// Create array
 		DynamicArray inputArray;
 		initArray(&inputArray, 32);
- 2b8:	60 e2       	ldi	r22, 0x20	; 32
- 2ba:	70 e0       	ldi	r23, 0x00	; 0
- 2bc:	ce 01       	movw	r24, r28
- 2be:	81 96       	adiw	r24, 0x21	; 33
- 2c0:	0e 94 13 02 	call	0x426	; 0x426 <initArray>
+ 294:	60 e2       	ldi	r22, 0x20	; 32
+ 296:	70 e0       	ldi	r23, 0x00	; 0
+ 298:	ce 01       	movw	r24, r28
+ 29a:	81 96       	adiw	r24, 0x21	; 33
+ 29c:	0e 94 01 02 	call	0x402	; 0x402 <initArray>
 		
 		// Get request
 		USART_Receive_Str(input, &inputArray);
- 2c4:	be 01       	movw	r22, r28
- 2c6:	6f 5d       	subi	r22, 0xDF	; 223
- 2c8:	7f 4f       	sbci	r23, 0xFF	; 255
- 2ca:	ce 01       	movw	r24, r28
- 2cc:	01 96       	adiw	r24, 0x01	; 1
- 2ce:	0e 94 8b 00 	call	0x116	; 0x116 <USART_Receive_Str>
+ 2a0:	be 01       	movw	r22, r28
+ 2a2:	6f 5d       	subi	r22, 0xDF	; 223
+ 2a4:	7f 4f       	sbci	r23, 0xFF	; 255
+ 2a6:	ce 01       	movw	r24, r28
+ 2a8:	01 96       	adiw	r24, 0x01	; 1
+ 2aa:	0e 94 8b 00 	call	0x116	; 0x116 <USART_Receive_Str>
 		
 		// Get CRC8 byte index
 		byte index_crc8 = getCRC8Index(input, &inputArray, FRAME_SIZE);
- 2d2:	40 e2       	ldi	r20, 0x20	; 32
- 2d4:	be 01       	movw	r22, r28
- 2d6:	6f 5d       	subi	r22, 0xDF	; 223
- 2d8:	7f 4f       	sbci	r23, 0xFF	; 255
- 2da:	ce 01       	movw	r24, r28
- 2dc:	01 96       	adiw	r24, 0x01	; 1
- 2de:	0e 94 fc 01 	call	0x3f8	; 0x3f8 <getCRC8Index>
- 2e2:	08 2f       	mov	r16, r24
+ 2ae:	40 e2       	ldi	r20, 0x20	; 32
+ 2b0:	be 01       	movw	r22, r28
+ 2b2:	6f 5d       	subi	r22, 0xDF	; 223
+ 2b4:	7f 4f       	sbci	r23, 0xFF	; 255
+ 2b6:	ce 01       	movw	r24, r28
+ 2b8:	01 96       	adiw	r24, 0x01	; 1
+ 2ba:	0e 94 ea 01 	call	0x3d4	; 0x3d4 <getCRC8Index>
+ 2be:	08 2f       	mov	r16, r24
 			
 		// Add CRC8 byte
 		byte crc8_code = crc8dy(&inputArray, index_crc8);
- 2e4:	68 2f       	mov	r22, r24
- 2e6:	ce 01       	movw	r24, r28
- 2e8:	81 96       	adiw	r24, 0x21	; 33
- 2ea:	0e 94 e6 01 	call	0x3cc	; 0x3cc <crc8dy>
- 2ee:	18 2f       	mov	r17, r24
+ 2c0:	68 2f       	mov	r22, r24
+ 2c2:	ce 01       	movw	r24, r28
+ 2c4:	81 96       	adiw	r24, 0x21	; 33
+ 2c6:	0e 94 d4 01 	call	0x3a8	; 0x3a8 <crc8dy>
+ 2ca:	18 2f       	mov	r17, r24
 		//input[index_crc8] = crc8_code;
 		
 		if (inputArray.array[index_crc8] == crc8_code) {
- 2f0:	e9 a1       	ldd	r30, Y+33	; 0x21
- 2f2:	fa a1       	ldd	r31, Y+34	; 0x22
- 2f4:	e0 0f       	add	r30, r16
- 2f6:	f1 1d       	adc	r31, r1
- 2f8:	80 81       	ld	r24, Z
- 2fa:	18 13       	cpse	r17, r24
- 2fc:	37 c0       	rjmp	.+110    	; 0x36c <main+0xde>
+ 2cc:	e9 a1       	ldd	r30, Y+33	; 0x21
+ 2ce:	fa a1       	ldd	r31, Y+34	; 0x22
+ 2d0:	e0 0f       	add	r30, r16
+ 2d2:	f1 1d       	adc	r31, r1
+ 2d4:	80 81       	ld	r24, Z
+ 2d6:	18 13       	cpse	r17, r24
+ 2d8:	37 c0       	rjmp	.+110    	; 0x348 <main+0xde>
 						
 			//Clear request data
 			freeArray(&inputArray);	
- 2fe:	ce 01       	movw	r24, r28
- 300:	81 96       	adiw	r24, 0x21	; 33
- 302:	0e 94 50 02 	call	0x4a0	; 0x4a0 <freeArray>
+ 2da:	ce 01       	movw	r24, r28
+ 2dc:	81 96       	adiw	r24, 0x21	; 33
+ 2de:	0e 94 3e 02 	call	0x47c	; 0x47c <freeArray>
 			initArray(&inputArray, 50);
- 306:	62 e3       	ldi	r22, 0x32	; 50
- 308:	70 e0       	ldi	r23, 0x00	; 0
- 30a:	ce 01       	movw	r24, r28
- 30c:	81 96       	adiw	r24, 0x21	; 33
- 30e:	0e 94 13 02 	call	0x426	; 0x426 <initArray>
+ 2e2:	62 e3       	ldi	r22, 0x32	; 50
+ 2e4:	70 e0       	ldi	r23, 0x00	; 0
+ 2e6:	ce 01       	movw	r24, r28
+ 2e8:	81 96       	adiw	r24, 0x21	; 33
+ 2ea:	0e 94 01 02 	call	0x402	; 0x402 <initArray>
 			
 			insertArray(&inputArray, CHR_COLON);
- 312:	6a e3       	ldi	r22, 0x3A	; 58
- 314:	ce 01       	movw	r24, r28
- 316:	81 96       	adiw	r24, 0x21	; 33
- 318:	0e 94 27 02 	call	0x44e	; 0x44e <insertArray>
+ 2ee:	6a e3       	ldi	r22, 0x3A	; 58
+ 2f0:	ce 01       	movw	r24, r28
+ 2f2:	81 96       	adiw	r24, 0x21	; 33
+ 2f4:	0e 94 15 02 	call	0x42a	; 0x42a <insertArray>
 			insertArray(&inputArray, 1);
- 31c:	61 e0       	ldi	r22, 0x01	; 1
- 31e:	ce 01       	movw	r24, r28
- 320:	81 96       	adiw	r24, 0x21	; 33
- 322:	0e 94 27 02 	call	0x44e	; 0x44e <insertArray>
+ 2f8:	61 e0       	ldi	r22, 0x01	; 1
+ 2fa:	ce 01       	movw	r24, r28
+ 2fc:	81 96       	adiw	r24, 0x21	; 33
+ 2fe:	0e 94 15 02 	call	0x42a	; 0x42a <insertArray>
 			insertArray(&inputArray, 2);
- 326:	62 e0       	ldi	r22, 0x02	; 2
- 328:	ce 01       	movw	r24, r28
- 32a:	81 96       	adiw	r24, 0x21	; 33
- 32c:	0e 94 27 02 	call	0x44e	; 0x44e <insertArray>
+ 302:	62 e0       	ldi	r22, 0x02	; 2
+ 304:	ce 01       	movw	r24, r28
+ 306:	81 96       	adiw	r24, 0x21	; 33
+ 308:	0e 94 15 02 	call	0x42a	; 0x42a <insertArray>
 			insertArray(&inputArray, 3);
- 330:	63 e0       	ldi	r22, 0x03	; 3
- 332:	ce 01       	movw	r24, r28
- 334:	81 96       	adiw	r24, 0x21	; 33
- 336:	0e 94 27 02 	call	0x44e	; 0x44e <insertArray>
+ 30c:	63 e0       	ldi	r22, 0x03	; 3
+ 30e:	ce 01       	movw	r24, r28
+ 310:	81 96       	adiw	r24, 0x21	; 33
+ 312:	0e 94 15 02 	call	0x42a	; 0x42a <insertArray>
 			insertArray(&inputArray, crc8_code);
- 33a:	61 2f       	mov	r22, r17
- 33c:	ce 01       	movw	r24, r28
- 33e:	81 96       	adiw	r24, 0x21	; 33
- 340:	0e 94 27 02 	call	0x44e	; 0x44e <insertArray>
+ 316:	61 2f       	mov	r22, r17
+ 318:	ce 01       	movw	r24, r28
+ 31a:	81 96       	adiw	r24, 0x21	; 33
+ 31c:	0e 94 15 02 	call	0x42a	; 0x42a <insertArray>
 			insertArray(&inputArray, CHR_COLON);
- 344:	6a e3       	ldi	r22, 0x3A	; 58
- 346:	ce 01       	movw	r24, r28
- 348:	81 96       	adiw	r24, 0x21	; 33
- 34a:	0e 94 27 02 	call	0x44e	; 0x44e <insertArray>
+ 320:	6a e3       	ldi	r22, 0x3A	; 58
+ 322:	ce 01       	movw	r24, r28
+ 324:	81 96       	adiw	r24, 0x21	; 33
+ 326:	0e 94 15 02 	call	0x42a	; 0x42a <insertArray>
 			insertArray(&inputArray, CHR_CARRET_RETURN);
- 34e:	6d e0       	ldi	r22, 0x0D	; 13
- 350:	ce 01       	movw	r24, r28
- 352:	81 96       	adiw	r24, 0x21	; 33
- 354:	0e 94 27 02 	call	0x44e	; 0x44e <insertArray>
+ 32a:	6d e0       	ldi	r22, 0x0D	; 13
+ 32c:	ce 01       	movw	r24, r28
+ 32e:	81 96       	adiw	r24, 0x21	; 33
+ 330:	0e 94 15 02 	call	0x42a	; 0x42a <insertArray>
 			insertArray(&inputArray, CHR_LINE_FEED);
- 358:	6a e0       	ldi	r22, 0x0A	; 10
- 35a:	ce 01       	movw	r24, r28
- 35c:	81 96       	adiw	r24, 0x21	; 33
- 35e:	0e 94 27 02 	call	0x44e	; 0x44e <insertArray>
+ 334:	6a e0       	ldi	r22, 0x0A	; 10
+ 336:	ce 01       	movw	r24, r28
+ 338:	81 96       	adiw	r24, 0x21	; 33
+ 33a:	0e 94 15 02 	call	0x42a	; 0x42a <insertArray>
 			
 			// Send response ( ECHO )
 			USART_Transmit_Str(&inputArray);			
- 362:	ce 01       	movw	r24, r28
- 364:	81 96       	adiw	r24, 0x21	; 33
- 366:	0e 94 ec 00 	call	0x1d8	; 0x1d8 <USART_Transmit_Str>
- 36a:	27 c0       	rjmp	.+78     	; 0x3ba <main+0x12c>
+ 33e:	ce 01       	movw	r24, r28
+ 340:	81 96       	adiw	r24, 0x21	; 33
+ 342:	0e 94 da 00 	call	0x1b4	; 0x1b4 <USART_Transmit_Str>
+ 346:	27 c0       	rjmp	.+78     	; 0x396 <main+0x12c>
 		} else /* ERROR */ {
 						
 			freeArray(&inputArray);	
- 36c:	ce 01       	movw	r24, r28
- 36e:	81 96       	adiw	r24, 0x21	; 33
- 370:	0e 94 50 02 	call	0x4a0	; 0x4a0 <freeArray>
+ 348:	ce 01       	movw	r24, r28
+ 34a:	81 96       	adiw	r24, 0x21	; 33
+ 34c:	0e 94 3e 02 	call	0x47c	; 0x47c <freeArray>
 			initArray(&inputArray, 32);
- 374:	60 e2       	ldi	r22, 0x20	; 32
- 376:	70 e0       	ldi	r23, 0x00	; 0
- 378:	ce 01       	movw	r24, r28
- 37a:	81 96       	adiw	r24, 0x21	; 33
- 37c:	0e 94 13 02 	call	0x426	; 0x426 <initArray>
+ 350:	60 e2       	ldi	r22, 0x20	; 32
+ 352:	70 e0       	ldi	r23, 0x00	; 0
+ 354:	ce 01       	movw	r24, r28
+ 356:	81 96       	adiw	r24, 0x21	; 33
+ 358:	0e 94 01 02 	call	0x402	; 0x402 <initArray>
 			
 			insertArray(&inputArray, CHR_COLON);
- 380:	6a e3       	ldi	r22, 0x3A	; 58
- 382:	ce 01       	movw	r24, r28
- 384:	81 96       	adiw	r24, 0x21	; 33
- 386:	0e 94 27 02 	call	0x44e	; 0x44e <insertArray>
+ 35c:	6a e3       	ldi	r22, 0x3A	; 58
+ 35e:	ce 01       	movw	r24, r28
+ 360:	81 96       	adiw	r24, 0x21	; 33
+ 362:	0e 94 15 02 	call	0x42a	; 0x42a <insertArray>
 			insertArray(&inputArray, crc8_code);			
- 38a:	61 2f       	mov	r22, r17
- 38c:	ce 01       	movw	r24, r28
- 38e:	81 96       	adiw	r24, 0x21	; 33
- 390:	0e 94 27 02 	call	0x44e	; 0x44e <insertArray>
+ 366:	61 2f       	mov	r22, r17
+ 368:	ce 01       	movw	r24, r28
+ 36a:	81 96       	adiw	r24, 0x21	; 33
+ 36c:	0e 94 15 02 	call	0x42a	; 0x42a <insertArray>
 			insertArray(&inputArray, CHR_COLON);
- 394:	6a e3       	ldi	r22, 0x3A	; 58
- 396:	ce 01       	movw	r24, r28
- 398:	81 96       	adiw	r24, 0x21	; 33
- 39a:	0e 94 27 02 	call	0x44e	; 0x44e <insertArray>
+ 370:	6a e3       	ldi	r22, 0x3A	; 58
+ 372:	ce 01       	movw	r24, r28
+ 374:	81 96       	adiw	r24, 0x21	; 33
+ 376:	0e 94 15 02 	call	0x42a	; 0x42a <insertArray>
 			insertArray(&inputArray, CHR_CARRET_RETURN);
- 39e:	6d e0       	ldi	r22, 0x0D	; 13
- 3a0:	ce 01       	movw	r24, r28
- 3a2:	81 96       	adiw	r24, 0x21	; 33
- 3a4:	0e 94 27 02 	call	0x44e	; 0x44e <insertArray>
+ 37a:	6d e0       	ldi	r22, 0x0D	; 13
+ 37c:	ce 01       	movw	r24, r28
+ 37e:	81 96       	adiw	r24, 0x21	; 33
+ 380:	0e 94 15 02 	call	0x42a	; 0x42a <insertArray>
 			insertArray(&inputArray, CHR_LINE_FEED);
- 3a8:	6a e0       	ldi	r22, 0x0A	; 10
- 3aa:	ce 01       	movw	r24, r28
- 3ac:	81 96       	adiw	r24, 0x21	; 33
- 3ae:	0e 94 27 02 	call	0x44e	; 0x44e <insertArray>
+ 384:	6a e0       	ldi	r22, 0x0A	; 10
+ 386:	ce 01       	movw	r24, r28
+ 388:	81 96       	adiw	r24, 0x21	; 33
+ 38a:	0e 94 15 02 	call	0x42a	; 0x42a <insertArray>
 			
 			// Send response
 			USART_Transmit_Str(&inputArray);
- 3b2:	ce 01       	movw	r24, r28
- 3b4:	81 96       	adiw	r24, 0x21	; 33
- 3b6:	0e 94 ec 00 	call	0x1d8	; 0x1d8 <USART_Transmit_Str>
+ 38e:	ce 01       	movw	r24, r28
+ 390:	81 96       	adiw	r24, 0x21	; 33
+ 392:	0e 94 da 00 	call	0x1b4	; 0x1b4 <USART_Transmit_Str>
 		}
 		
 		// Clear array
 		Clean_Data(input);
- 3ba:	ce 01       	movw	r24, r28
- 3bc:	01 96       	adiw	r24, 0x01	; 1
- 3be:	0e 94 1b 01 	call	0x236	; 0x236 <Clean_Data>
+ 396:	ce 01       	movw	r24, r28
+ 398:	01 96       	adiw	r24, 0x01	; 1
+ 39a:	0e 94 09 01 	call	0x212	; 0x212 <Clean_Data>
 		
 		// Free Array
 		freeArray(&inputArray);	
- 3c2:	ce 01       	movw	r24, r28
- 3c4:	81 96       	adiw	r24, 0x21	; 33
- 3c6:	0e 94 50 02 	call	0x4a0	; 0x4a0 <freeArray>
+ 39e:	ce 01       	movw	r24, r28
+ 3a0:	81 96       	adiw	r24, 0x21	; 33
+ 3a2:	0e 94 3e 02 	call	0x47c	; 0x47c <freeArray>
 		
 		// Info Blink
 		//blink();
 	}
- 3ca:	76 cf       	rjmp	.-276    	; 0x2b8 <main+0x2a>
+ 3a6:	76 cf       	rjmp	.-276    	; 0x294 <main+0x2a>
 
-000003cc <crc8dy>:
+000003a8 <crc8dy>:
 }
 */
 
 uint8_t crc8dy(DynamicArray* a, uint8_t len) {
 	uint8_t crc = 0xFF;
 	for (int i = 0; i < len; i++) {
- 3cc:	66 23       	and	r22, r22
- 3ce:	91 f0       	breq	.+36     	; 0x3f4 <crc8dy+0x28>
+ 3a8:	66 23       	and	r22, r22
+ 3aa:	91 f0       	breq	.+36     	; 0x3d0 <crc8dy+0x28>
 		uint8_t temp = a->array[i]; //*pcBlock++;
- 3d0:	fc 01       	movw	r30, r24
- 3d2:	a0 81       	ld	r26, Z
- 3d4:	b1 81       	ldd	r27, Z+1	; 0x01
- 3d6:	9d 01       	movw	r18, r26
- 3d8:	26 0f       	add	r18, r22
- 3da:	31 1d       	adc	r19, r1
- 3dc:	8f ef       	ldi	r24, 0xFF	; 255
- 3de:	ed 91       	ld	r30, X+
+ 3ac:	fc 01       	movw	r30, r24
+ 3ae:	a0 81       	ld	r26, Z
+ 3b0:	b1 81       	ldd	r27, Z+1	; 0x01
+ 3b2:	9d 01       	movw	r18, r26
+ 3b4:	26 0f       	add	r18, r22
+ 3b6:	31 1d       	adc	r19, r1
+ 3b8:	8f ef       	ldi	r24, 0xFF	; 255
+ 3ba:	ed 91       	ld	r30, X+
 		uint8_t index = crc ^ temp;
 		crc = Crc8Table[index];
- 3e0:	8e 27       	eor	r24, r30
- 3e2:	e8 2f       	mov	r30, r24
- 3e4:	f0 e0       	ldi	r31, 0x00	; 0
- 3e6:	ea 5f       	subi	r30, 0xFA	; 250
- 3e8:	fe 4f       	sbci	r31, 0xFE	; 254
- 3ea:	80 81       	ld	r24, Z
+ 3bc:	8e 27       	eor	r24, r30
+ 3be:	e8 2f       	mov	r30, r24
+ 3c0:	f0 e0       	ldi	r31, 0x00	; 0
+ 3c2:	ea 5f       	subi	r30, 0xFA	; 250
+ 3c4:	fe 4f       	sbci	r31, 0xFE	; 254
+ 3c6:	80 81       	ld	r24, Z
 }
 */
 
 uint8_t crc8dy(DynamicArray* a, uint8_t len) {
 	uint8_t crc = 0xFF;
 	for (int i = 0; i < len; i++) {
- 3ec:	a2 17       	cp	r26, r18
- 3ee:	b3 07       	cpc	r27, r19
- 3f0:	b1 f7       	brne	.-20     	; 0x3de <crc8dy+0x12>
- 3f2:	08 95       	ret
+ 3c8:	a2 17       	cp	r26, r18
+ 3ca:	b3 07       	cpc	r27, r19
+ 3cc:	b1 f7       	brne	.-20     	; 0x3ba <crc8dy+0x12>
+ 3ce:	08 95       	ret
 	return crc;
 }
 */
 
 uint8_t crc8dy(DynamicArray* a, uint8_t len) {
 	uint8_t crc = 0xFF;
- 3f4:	8f ef       	ldi	r24, 0xFF	; 255
+ 3d0:	8f ef       	ldi	r24, 0xFF	; 255
 		uint8_t index = crc ^ temp;
 		crc = Crc8Table[index];
 	}
 
 	return crc;
 }
- 3f6:	08 95       	ret
+ 3d2:	08 95       	ret
 
-000003f8 <getCRC8Index>:
+000003d4 <getCRC8Index>:
 
 byte getCRC8Index(byte *input_data, DynamicArray* a, uint8_t frame_size) {
 	uint8_t x = 0;
 	for (uint8_t i = 0; i < frame_size; i++) {
- 3f8:	44 23       	and	r20, r20
- 3fa:	99 f0       	breq	.+38     	; 0x422 <__LOCK_REGION_LENGTH__+0x22>
- 3fc:	e8 2f       	mov	r30, r24
- 3fe:	f9 2f       	mov	r31, r25
- 400:	90 e0       	ldi	r25, 0x00	; 0
+ 3d4:	44 23       	and	r20, r20
+ 3d6:	99 f0       	breq	.+38     	; 0x3fe <getCRC8Index+0x2a>
+ 3d8:	e8 2f       	mov	r30, r24
+ 3da:	f9 2f       	mov	r31, r25
+ 3dc:	90 e0       	ldi	r25, 0x00	; 0
 		// Need many checks
 		if (input_data[i] == CHR_COLON && i > 0) {
- 402:	21 91       	ld	r18, Z+
- 404:	2a 33       	cpi	r18, 0x3A	; 58
- 406:	41 f4       	brne	.+16     	; 0x418 <__LOCK_REGION_LENGTH__+0x18>
- 408:	99 23       	and	r25, r25
- 40a:	31 f0       	breq	.+12     	; 0x418 <__LOCK_REGION_LENGTH__+0x18>
+ 3de:	21 91       	ld	r18, Z+
+ 3e0:	2a 33       	cpi	r18, 0x3A	; 58
+ 3e2:	41 f4       	brne	.+16     	; 0x3f4 <getCRC8Index+0x20>
+ 3e4:	99 23       	and	r25, r25
+ 3e6:	31 f0       	breq	.+12     	; 0x3f4 <getCRC8Index+0x20>
 			if (input_data[i+1] == CHR_CARRET_RETURN) {
- 40c:	80 81       	ld	r24, Z
- 40e:	8d 30       	cpi	r24, 0x0D	; 13
- 410:	19 f4       	brne	.+6      	; 0x418 <__LOCK_REGION_LENGTH__+0x18>
+ 3e8:	80 81       	ld	r24, Z
+ 3ea:	8d 30       	cpi	r24, 0x0D	; 13
+ 3ec:	19 f4       	brne	.+6      	; 0x3f4 <getCRC8Index+0x20>
 				return i - 1;
- 412:	8f ef       	ldi	r24, 0xFF	; 255
- 414:	89 0f       	add	r24, r25
- 416:	08 95       	ret
+ 3ee:	8f ef       	ldi	r24, 0xFF	; 255
+ 3f0:	89 0f       	add	r24, r25
+ 3f2:	08 95       	ret
 			}
 		}
 		
 		x++;
- 418:	9f 5f       	subi	r25, 0xFF	; 255
+ 3f4:	9f 5f       	subi	r25, 0xFF	; 255
 	return crc;
 }
 
 byte getCRC8Index(byte *input_data, DynamicArray* a, uint8_t frame_size) {
 	uint8_t x = 0;
 	for (uint8_t i = 0; i < frame_size; i++) {
- 41a:	49 13       	cpse	r20, r25
- 41c:	f2 cf       	rjmp	.-28     	; 0x402 <__LOCK_REGION_LENGTH__+0x2>
+ 3f6:	49 13       	cpse	r20, r25
+ 3f8:	f2 cf       	rjmp	.-28     	; 0x3de <getCRC8Index+0xa>
 			if (input_data[i+1] == CHR_CARRET_RETURN) {
 				return i - 1;
 			}
 		}
 		
 		x++;
- 41e:	84 2f       	mov	r24, r20
- 420:	08 95       	ret
+ 3fa:	84 2f       	mov	r24, r20
+ 3fc:	08 95       	ret
 
 	return crc;
 }
 
 byte getCRC8Index(byte *input_data, DynamicArray* a, uint8_t frame_size) {
 	uint8_t x = 0;
- 422:	80 e0       	ldi	r24, 0x00	; 0
+ 3fe:	80 e0       	ldi	r24, 0x00	; 0
 		
 		x++;
 	}
 	
 	return x;
 }
- 424:	08 95       	ret
+ 400:	08 95       	ret
 
-00000426 <initArray>:
+00000402 <initArray>:
 
 void initArray(DynamicArray* a, size_t initialSize) {
- 426:	0f 93       	push	r16
- 428:	1f 93       	push	r17
- 42a:	cf 93       	push	r28
- 42c:	df 93       	push	r29
- 42e:	ec 01       	movw	r28, r24
- 430:	8b 01       	movw	r16, r22
+ 402:	0f 93       	push	r16
+ 404:	1f 93       	push	r17
+ 406:	cf 93       	push	r28
+ 408:	df 93       	push	r29
+ 40a:	ec 01       	movw	r28, r24
+ 40c:	8b 01       	movw	r16, r22
 	a->array = (byte*)malloc(initialSize * sizeof(byte));
- 432:	cb 01       	movw	r24, r22
- 434:	0e 94 60 02 	call	0x4c0	; 0x4c0 <malloc>
- 438:	99 83       	std	Y+1, r25	; 0x01
- 43a:	88 83       	st	Y, r24
+ 40e:	cb 01       	movw	r24, r22
+ 410:	0e 94 60 02 	call	0x4c0	; 0x4c0 <malloc>
+ 414:	99 83       	std	Y+1, r25	; 0x01
+ 416:	88 83       	st	Y, r24
 	a->used = 0;
- 43c:	1b 82       	std	Y+3, r1	; 0x03
- 43e:	1a 82       	std	Y+2, r1	; 0x02
+ 418:	1b 82       	std	Y+3, r1	; 0x03
+ 41a:	1a 82       	std	Y+2, r1	; 0x02
 	a->size = initialSize;
- 440:	1d 83       	std	Y+5, r17	; 0x05
- 442:	0c 83       	std	Y+4, r16	; 0x04
+ 41c:	1d 83       	std	Y+5, r17	; 0x05
+ 41e:	0c 83       	std	Y+4, r16	; 0x04
 }
- 444:	df 91       	pop	r29
- 446:	cf 91       	pop	r28
- 448:	1f 91       	pop	r17
- 44a:	0f 91       	pop	r16
- 44c:	08 95       	ret
+ 420:	df 91       	pop	r29
+ 422:	cf 91       	pop	r28
+ 424:	1f 91       	pop	r17
+ 426:	0f 91       	pop	r16
+ 428:	08 95       	ret
 
-0000044e <insertArray>:
+0000042a <insertArray>:
 
 void insertArray(DynamicArray* a, byte element_byte) {
- 44e:	1f 93       	push	r17
- 450:	cf 93       	push	r28
- 452:	df 93       	push	r29
- 454:	ec 01       	movw	r28, r24
- 456:	16 2f       	mov	r17, r22
+ 42a:	1f 93       	push	r17
+ 42c:	cf 93       	push	r28
+ 42e:	df 93       	push	r29
+ 430:	ec 01       	movw	r28, r24
+ 432:	16 2f       	mov	r17, r22
 	if (a->used == a->size) {
- 458:	6a 81       	ldd	r22, Y+2	; 0x02
- 45a:	7b 81       	ldd	r23, Y+3	; 0x03
- 45c:	8c 81       	ldd	r24, Y+4	; 0x04
- 45e:	9d 81       	ldd	r25, Y+5	; 0x05
- 460:	68 17       	cp	r22, r24
- 462:	79 07       	cpc	r23, r25
- 464:	61 f4       	brne	.+24     	; 0x47e <insertArray+0x30>
+ 434:	6a 81       	ldd	r22, Y+2	; 0x02
+ 436:	7b 81       	ldd	r23, Y+3	; 0x03
+ 438:	8c 81       	ldd	r24, Y+4	; 0x04
+ 43a:	9d 81       	ldd	r25, Y+5	; 0x05
+ 43c:	68 17       	cp	r22, r24
+ 43e:	79 07       	cpc	r23, r25
+ 440:	61 f4       	brne	.+24     	; 0x45a <insertArray+0x30>
 		a->size += 1;
- 466:	6f 5f       	subi	r22, 0xFF	; 255
- 468:	7f 4f       	sbci	r23, 0xFF	; 255
- 46a:	7d 83       	std	Y+5, r23	; 0x05
- 46c:	6c 83       	std	Y+4, r22	; 0x04
+ 442:	6f 5f       	subi	r22, 0xFF	; 255
+ 444:	7f 4f       	sbci	r23, 0xFF	; 255
+ 446:	7d 83       	std	Y+5, r23	; 0x05
+ 448:	6c 83       	std	Y+4, r22	; 0x04
 		byte* newarr = (byte*)realloc(a->array, a->size * sizeof(byte));
- 46e:	88 81       	ld	r24, Y
- 470:	99 81       	ldd	r25, Y+1	; 0x01
- 472:	0e 94 81 03 	call	0x702	; 0x702 <realloc>
+ 44a:	88 81       	ld	r24, Y
+ 44c:	99 81       	ldd	r25, Y+1	; 0x01
+ 44e:	0e 94 81 03 	call	0x702	; 0x702 <realloc>
 		if (newarr == NULL) return; // Block don't selected - return
- 476:	00 97       	sbiw	r24, 0x00	; 0
- 478:	79 f0       	breq	.+30     	; 0x498 <insertArray+0x4a>
+ 452:	00 97       	sbiw	r24, 0x00	; 0
+ 454:	79 f0       	breq	.+30     	; 0x474 <insertArray+0x4a>
 		a->array = newarr;
- 47a:	99 83       	std	Y+1, r25	; 0x01
- 47c:	88 83       	st	Y, r24
+ 456:	99 83       	std	Y+1, r25	; 0x01
+ 458:	88 83       	st	Y, r24
 	}
 
 	a->array[a->used++] = element_byte;
- 47e:	28 81       	ld	r18, Y
- 480:	39 81       	ldd	r19, Y+1	; 0x01
- 482:	8a 81       	ldd	r24, Y+2	; 0x02
- 484:	9b 81       	ldd	r25, Y+3	; 0x03
- 486:	ac 01       	movw	r20, r24
- 488:	4f 5f       	subi	r20, 0xFF	; 255
- 48a:	5f 4f       	sbci	r21, 0xFF	; 255
- 48c:	5b 83       	std	Y+3, r21	; 0x03
- 48e:	4a 83       	std	Y+2, r20	; 0x02
- 490:	f9 01       	movw	r30, r18
- 492:	e8 0f       	add	r30, r24
- 494:	f9 1f       	adc	r31, r25
- 496:	10 83       	st	Z, r17
+ 45a:	28 81       	ld	r18, Y
+ 45c:	39 81       	ldd	r19, Y+1	; 0x01
+ 45e:	8a 81       	ldd	r24, Y+2	; 0x02
+ 460:	9b 81       	ldd	r25, Y+3	; 0x03
+ 462:	ac 01       	movw	r20, r24
+ 464:	4f 5f       	subi	r20, 0xFF	; 255
+ 466:	5f 4f       	sbci	r21, 0xFF	; 255
+ 468:	5b 83       	std	Y+3, r21	; 0x03
+ 46a:	4a 83       	std	Y+2, r20	; 0x02
+ 46c:	f9 01       	movw	r30, r18
+ 46e:	e8 0f       	add	r30, r24
+ 470:	f9 1f       	adc	r31, r25
+ 472:	10 83       	st	Z, r17
 }
- 498:	df 91       	pop	r29
- 49a:	cf 91       	pop	r28
- 49c:	1f 91       	pop	r17
- 49e:	08 95       	ret
+ 474:	df 91       	pop	r29
+ 476:	cf 91       	pop	r28
+ 478:	1f 91       	pop	r17
+ 47a:	08 95       	ret
 
-000004a0 <freeArray>:
+0000047c <freeArray>:
 
 void freeArray(DynamicArray* a) {
- 4a0:	cf 93       	push	r28
- 4a2:	df 93       	push	r29
- 4a4:	ec 01       	movw	r28, r24
+ 47c:	cf 93       	push	r28
+ 47e:	df 93       	push	r29
+ 480:	ec 01       	movw	r28, r24
 	free(a->array);
- 4a6:	88 81       	ld	r24, Y
- 4a8:	99 81       	ldd	r25, Y+1	; 0x01
- 4aa:	0e 94 f8 02 	call	0x5f0	; 0x5f0 <free>
+ 482:	88 81       	ld	r24, Y
+ 484:	99 81       	ldd	r25, Y+1	; 0x01
+ 486:	0e 94 f8 02 	call	0x5f0	; 0x5f0 <free>
 	a->array = NULL;
- 4ae:	19 82       	std	Y+1, r1	; 0x01
- 4b0:	18 82       	st	Y, r1
+ 48a:	19 82       	std	Y+1, r1	; 0x01
+ 48c:	18 82       	st	Y, r1
 	a->used = a->size = 0;
- 4b2:	1d 82       	std	Y+5, r1	; 0x05
- 4b4:	1c 82       	std	Y+4, r1	; 0x04
- 4b6:	1b 82       	std	Y+3, r1	; 0x03
- 4b8:	1a 82       	std	Y+2, r1	; 0x02
+ 48e:	1d 82       	std	Y+5, r1	; 0x05
+ 490:	1c 82       	std	Y+4, r1	; 0x04
+ 492:	1b 82       	std	Y+3, r1	; 0x03
+ 494:	1a 82       	std	Y+2, r1	; 0x02
 }
- 4ba:	df 91       	pop	r29
- 4bc:	cf 91       	pop	r28
+ 496:	df 91       	pop	r29
+ 498:	cf 91       	pop	r28
+ 49a:	08 95       	ret
+
+0000049c <blink_WD>:
+
+void blink_WD() {
+	PORTB |= ( 1 << PINB4 ); //0xFF; //On
+ 49c:	2c 9a       	sbi	0x05, 4	; 5
+ 49e:	8f e9       	ldi	r24, 0x9F	; 159
+ 4a0:	9f e0       	ldi	r25, 0x0F	; 15
+ 4a2:	01 97       	sbiw	r24, 0x01	; 1
+ 4a4:	f1 f7       	brne	.-4      	; 0x4a2 <blink_WD+0x6>
+ 4a6:	00 c0       	rjmp	.+0      	; 0x4a8 <blink_WD+0xc>
+ 4a8:	00 00       	nop
+	_delay_ms(1);
+	PORTB &= ~( 1 << PINB4 ); //0x00; //OFF
+ 4aa:	2c 98       	cbi	0x05, 4	; 5
+ 4ac:	08 95       	ret
+
+000004ae <blink>:
+}
+
+void blink() {
+	PORTB |= ( 1 << PINB5 ); //0xFF; //On
+ 4ae:	2d 9a       	sbi	0x05, 5	; 5
+ 4b0:	8f e9       	ldi	r24, 0x9F	; 159
+ 4b2:	9f e0       	ldi	r25, 0x0F	; 15
+ 4b4:	01 97       	sbiw	r24, 0x01	; 1
+ 4b6:	f1 f7       	brne	.-4      	; 0x4b4 <blink+0x6>
+ 4b8:	00 c0       	rjmp	.+0      	; 0x4ba <blink+0xc>
+ 4ba:	00 00       	nop
+	_delay_ms(1);
+	PORTB &= ~( 1 << PINB5 ); //0x00; //OFF
+ 4bc:	2d 98       	cbi	0x05, 5	; 5
  4be:	08 95       	ret
 
 000004c0 <malloc>:

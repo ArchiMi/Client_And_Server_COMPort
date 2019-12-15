@@ -7,6 +7,7 @@
 
 typedef unsigned char byte;
 
+#define F_CPU 16000000UL
 #define NULL ((void*)0)
 
 // In table 'Examples of UBRRn Settings' for ATmega328P U2X=1 "7 - 256000 Baud" or 207 - 9600

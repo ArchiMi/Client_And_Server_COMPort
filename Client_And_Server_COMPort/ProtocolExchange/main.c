@@ -1,13 +1,12 @@
-#define F_CPU 16000000UL
-
+#include "Src/const.h"
+#include "Src/utils.h"
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/pgmspace.h>
 #include <avr/wdt.h>
 #include <avr/interrupt.h>
 #include <stdbool.h>
-#include "Src/const.h"
-#include "Src/utils.h"
+
 
 void USART_Init() {
 	sei();
@@ -109,18 +108,6 @@ void USART_Transmit_Str(DynamicArray* a) {
 	
 	// Info Blink
 	blink();
-}
-
-void blink_WD() {
-	PORTB |= ( 1 << PINB4 ); //0xFF; //On
-	_delay_ms(1);
-	PORTB &= ~( 1 << PINB4 ); //0x00; //OFF
-}
-
-void blink() {
-	PORTB |= ( 1 << PINB5 ); //0xFF; //On
-	_delay_ms(1);
-	PORTB &= ~( 1 << PINB5 ); //0x00; //OFF
 }
 
 void Clean_Data(byte *input_data) {

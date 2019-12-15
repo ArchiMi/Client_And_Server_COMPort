@@ -96,20 +96,17 @@ uint8_t crc8dy(DynamicArray* a, uint8_t len) {
 	return crc;
 }
 
-byte getCRC8Index(byte *input_data, DynamicArray* a, uint8_t frame_size) {
-	uint8_t x = 0;
-	for (uint8_t i = 0; i < frame_size; i++) {
+byte getCRC8Index(DynamicArray* a) {	
+	for (int i = 0; i < a->size; i++) {
 		// Need many checks
-		if (input_data[i] == CHR_COLON && i > 0) {
-			if (input_data[i+1] == CHR_CARRET_RETURN) {
+		if (a->array[i] == CHR_COLON && i > 0) {
+			if (a->array[i + 1] == CHR_CARRET_RETURN) {
 				return i - 1;
 			}
 		}
-		
-		x++;
 	}
 	
-	return x;
+	return 0;
 }
 
 void initArray(DynamicArray* a, size_t initialSize) {

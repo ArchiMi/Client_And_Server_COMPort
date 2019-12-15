@@ -41,15 +41,14 @@ byte USART_Receive(void) {
 	return UDR0;	
 }
 
-void USART_Receive_Str(byte *calledstring, DynamicArray* a) {
+void USART_Receive_Str(DynamicArray* a) {
 	char ch;
 	
 	int i = 0;	
 	while(1) {				
 		// Check error from receive 
-		if (i == FRAME_SIZE) {
-			return;
-		}		
+		if (i == FRAME_SIZE) 
+			return;	
 	
 		// Get input char	
 		ch = USART_Receive();
@@ -60,18 +59,15 @@ void USART_Receive_Str(byte *calledstring, DynamicArray* a) {
 		} else {
 			if (ch == CHR_LINE_FEED && i > 0) {
 				int previous_index = i - 1;
- 				if (calledstring[previous_index] == CHR_CARRET_RETURN) {
-					calledstring[i] = CHR_LINE_FEED;
+				if (a->array[previous_index] == CHR_CARRET_RETURN) {
 					insertArray(a, CHR_LINE_FEED);
 					return;
 				} else {
-					calledstring[i] = ch;
 					insertArray(a, ch);
 				}
 			} else {
-				calledstring[i] = ch;
-				insertArray(a, ch);
-			}	
+				insertArray(a, ch);	
+			}
 		}
 		
 		i++;
@@ -84,20 +80,8 @@ void USART_Send(byte data) {
 }
 
 void USART_Transmit_Str(DynamicArray* a) {
-	// Chars array
-	/*
-	for (int i = 0; i <= FRAME_SIZE; i++) {
-		if (calledstring[i] != 0)
-			// Send char
-			USART_Send(calledstring[i]);
-		else 
-			break;		
-	}
-	*/
-	
-	//Array
-	int count = a->size;
-	for (int i = 0; i < count; i++) {		
+	// Send array
+	for (int i = 0; i < a->size; i++) {		
 		if (a->array[i] != 0)
 			// Send char
 			USART_Send(a->array[i]);
@@ -108,12 +92,6 @@ void USART_Transmit_Str(DynamicArray* a) {
 	
 	// Info Blink
 	blink();
-}
-
-void Clean_Data(byte *input_data) {
-	for (uint8_t i = 0; i < FRAME_SIZE; i++) {
-		input_data[i] = 0;
-	}
 }
 
 // Watch dog
@@ -128,47 +106,50 @@ ISR(WDT_vect) {
 int main(void) {
 	DDRB = 0xFF; //PORTB as Output
 	
-	byte input[FRAME_SIZE] = { 0 };
-	
 	USART_Init();       
 	
 	while(1) {
-		// Create array
+		// Create input array
 		DynamicArray inputArray;
 		initArray(&inputArray, 32);
 		
 		// Get request
-		USART_Receive_Str(input, &inputArray);
+		USART_Receive_Str(&inputArray);
 		
 		// Get CRC8 byte index
-		byte index_crc8 = getCRC8Index(input, &inputArray, FRAME_SIZE);
+		byte index_crc8 = getCRC8Index(&inputArray);
 			
 		// Add CRC8 byte
 		byte crc8_code = crc8dy(&inputArray, index_crc8);
 		//input[index_crc8] = crc8_code;
 		
 		if (inputArray.array[index_crc8] == crc8_code) {
-						
-			//Clear request data
+				
+			// Create array
 			freeArray(&inputArray);	
-			initArray(&inputArray, 50);
+			initArray(&inputArray, 32);
 			
+			// Frame
 			insertArray(&inputArray, CHR_COLON);
 			insertArray(&inputArray, 1);
 			insertArray(&inputArray, 2);
 			insertArray(&inputArray, 3);
+			insertArray(&inputArray, 4);
+			insertArray(&inputArray, 5);
 			insertArray(&inputArray, crc8_code);
 			insertArray(&inputArray, CHR_COLON);
 			insertArray(&inputArray, CHR_CARRET_RETURN);
 			insertArray(&inputArray, CHR_LINE_FEED);
-			
+							
 			// Send response ( ECHO )
 			USART_Transmit_Str(&inputArray);			
 		} else /* ERROR */ {
 						
-			freeArray(&inputArray);	
+			// Create array
+			freeArray(&inputArray);
 			initArray(&inputArray, 32);
 			
+			// Frame
 			insertArray(&inputArray, CHR_COLON);
 			insertArray(&inputArray, crc8_code);			
 			insertArray(&inputArray, CHR_COLON);
@@ -179,14 +160,8 @@ int main(void) {
 			USART_Transmit_Str(&inputArray);
 		}
 		
-		// Clear array
-		Clean_Data(input);
-		
-		// Free Array
+		// Free input array
 		freeArray(&inputArray);	
-		
-		// Info Blink
-		//blink();
 	}
 	
 	return 0;
